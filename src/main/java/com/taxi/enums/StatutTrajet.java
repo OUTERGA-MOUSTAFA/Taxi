@@ -1,4 +1,4 @@
-package main.java.com.taxi.enums;
+package com.taxi.enums;
 
 public enum StatutTrajet {
     PUBLIE, COMPLET, TERMINE, ANNULE;
