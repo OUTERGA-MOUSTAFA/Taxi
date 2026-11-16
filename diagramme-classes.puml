@@ -1,0 +1,79 @@
+@startuml diagramme-classes-covoiturage
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty methods
+
+enum StatutTrajet {
+  PUBLIE
+  COMPLET
+  TERMINE
+  ANNULE
+}
+
+enum StatutReservation {
+  CONFIRMEE
+  ANNULEE
+}
+
+class Conducteur {
+  - id : Long
+  - nom : String
+  - prenom : String
+  - email : String
+  - telephone : String
+  - numeroPermis : String
+}
+
+class Passager {
+  - id : Long
+  - nom : String
+  - prenom : String
+  - email : String
+  - telephone : String
+}
+
+class Vehicule {
+  - id : Long
+  - marque : String
+  - modele : String
+  - immatriculation : String
+  - couleur : String
+  - capacite : int
+}
+
+class Trajet {
+  - id : Long
+  - villeDepart : String
+  - villeArrivee : String
+  - dateDepart : LocalDateTime
+  - placesProposees : int
+  - statut : StatutTrajet
+}
+
+class PointArret {
+  - id : Long
+  - ville : String
+  - ordre : int
+  - heurePassage : LocalDateTime
+  - prixDepuisDepart : BigDecimal
+}
+
+class Reservation {
+  - id : Long
+  - nombrePlaces : int
+  - montantTotal : BigDecimal
+  - dateReservation : LocalDateTime
+  - statut : StatutReservation
+}
+
+Conducteur "1" -- "0..*" Vehicule : possede >
+Conducteur "1" -- "0..*" Trajet : publie >
+Vehicule "1" -- "0..*" Trajet : utilise pour >
+Trajet "1" *-- "2..*" PointArret : pointsArret\n(tries par ordre)
+Passager "1" -- "0..*" Reservation : effectue >
+Trajet "1" -- "0..*" Reservation : recoit >
+Reservation "0..*" --> "1" PointArret : pointMontee
+Reservation "0..*" --> "1" PointArret : pointDescente
+Trajet ..> StatutTrajet
+Reservation ..> StatutReservation
+@enduml
