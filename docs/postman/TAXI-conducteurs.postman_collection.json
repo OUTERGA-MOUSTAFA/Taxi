@@ -1,0 +1,234 @@
+{
+  "info": {
+    "name": "TAXI - Conducteurs",
+    "description": "Tests du CRUD conducteur (T2.1). Lancer les requêtes dans l'ordre, ou toute la collection avec le Runner. Chaque exécution utilise un suffixe unique, donc la collection peut être relancée sans vider la base.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "run", "value": "" },
+    { "key": "hamidId", "value": "" },
+    { "key": "youssefId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 Créer Hamid (201)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.collectionVariables.set('run', Date.now().toString().slice(-6));"
+          ] }
+        },
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+            "const c = pm.response.json();",
+            "pm.test('Un id est renvoyé', () => pm.expect(c.id).to.be.a('number'));",
+            "pm.test('Le nom est enregistré', () => pm.expect(c.nom).to.eql('Alaoui'));",
+            "pm.collectionVariables.set('hamidId', c.id);"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Alaoui\",\n  \"prenom\": \"Hamid\",\n  \"email\": \"hamid{{run}}@taxi.ma\",\n  \"telephone\": \"0612345678\",\n  \"numeroPermis\": \"PH{{run}}\"\n}" }
+      }
+    },
+    {
+      "name": "02 Créer Youssef (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('youssefId', pm.response.json().id);"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Bennani\",\n  \"prenom\": \"Youssef\",\n  \"email\": \"youssef{{run}}@taxi.ma\",\n  \"telephone\": \"0698765432\",\n  \"numeroPermis\": \"PY{{run}}\"\n}" }
+      }
+    },
+    {
+      "name": "03 Email déjà utilisé (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 409', () => pm.response.to.have.status(409));",
+            "pm.test('Message sur l\\'email', () => pm.expect(pm.response.json().detail).to.include('email'));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Copie\",\n  \"prenom\": \"Email\",\n  \"email\": \"hamid{{run}}@taxi.ma\",\n  \"telephone\": \"0611111111\",\n  \"numeroPermis\": \"PX{{run}}\"\n}" }
+      }
+    },
+    {
+      "name": "04 Numéro de permis déjà utilisé (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 409', () => pm.response.to.have.status(409));",
+            "pm.test('Message sur le permis', () => pm.expect(pm.response.json().detail).to.include('permis'));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Copie\",\n  \"prenom\": \"Permis\",\n  \"email\": \"autre{{run}}@taxi.ma\",\n  \"telephone\": \"0622222222\",\n  \"numeroPermis\": \"PH{{run}}\"\n}" }
+      }
+    },
+    {
+      "name": "05 Champs invalides (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 400', () => pm.response.to.have.status(400));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"\",\n  \"prenom\": \"Test\",\n  \"email\": \"pas-un-email\",\n  \"telephone\": \"0633333333\",\n  \"numeroPermis\": \"\"\n}" }
+      }
+    },
+    {
+      "name": "06 Lister les conducteurs (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+            "pm.test('Au moins 2 conducteurs', () => pm.expect(pm.response.json().length).to.be.at.least(2));"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs" }
+    },
+    {
+      "name": "07 Consulter Hamid (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+            "pm.test('Bon conducteur', () => pm.expect(pm.response.json().id).to.eql(Number(pm.collectionVariables.get('hamidId'))));"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs/{{hamidId}}" }
+    },
+    {
+      "name": "08 Conducteur inexistant (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 404', () => pm.response.to.have.status(404));",
+            "const p = pm.response.json();",
+            "pm.test('ProblemDetail avec message et timestamp', () => { pm.expect(p.detail).to.be.a('string'); pm.expect(p.timestamp).to.exist; });"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs/999999" }
+    },
+    {
+      "name": "09 Rechercher par nom (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Au moins un résultat', () => pm.expect(r.length).to.be.at.least(1));",
+            "pm.test('Tous les résultats contiennent alaoui', () => pm.expect(r.every(c => c.nom.toLowerCase().includes('alaoui'))).to.be.true);"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs/recherche?nom=alaoui" }
+    },
+    {
+      "name": "10 Rechercher par email (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Un seul résultat : Youssef', () => { pm.expect(r.length).to.eql(1); pm.expect(r[0].prenom).to.eql('Youssef'); });"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs/recherche?email=youssef{{run}}" }
+    },
+    {
+      "name": "11 Modifier Hamid (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+            "pm.test('Téléphone modifié', () => pm.expect(pm.response.json().telephone).to.eql('0600000000'));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs/{{hamidId}}",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Alaoui\",\n  \"prenom\": \"Hamid\",\n  \"email\": \"hamid{{run}}@taxi.ma\",\n  \"telephone\": \"0600000000\",\n  \"numeroPermis\": \"PH{{run}}\"\n}" }
+      }
+    },
+    {
+      "name": "12 Modifier avec l'email de Youssef (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 409', () => pm.response.to.have.status(409));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs/{{hamidId}}",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Alaoui\",\n  \"prenom\": \"Hamid\",\n  \"email\": \"youssef{{run}}@taxi.ma\",\n  \"telephone\": \"0600000000\",\n  \"numeroPermis\": \"PH{{run}}\"\n}" }
+      }
+    },
+    {
+      "name": "13 Modifier un conducteur inexistant (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 404', () => pm.response.to.have.status(404));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs/999999",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Fantome\",\n  \"prenom\": \"Test\",\n  \"email\": \"fantome{{run}}@taxi.ma\",\n  \"telephone\": \"0644444444\",\n  \"numeroPermis\": \"PF{{run}}\"\n}" }
+      }
+    }
+  ]
+}

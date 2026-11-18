@@ -14,12 +14,10 @@ import com.taxi.repository.ConducteurRepository;
 import com.taxi.service.ConducteurService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-@Slf4j
 
 @Service
-@RequiredArgsConstructor 
-public class ConducteurServiceImpl implements ConducteurService{
+@RequiredArgsConstructor
+public class ConducteurServiceImpl implements ConducteurService {
     private final ConducteurRepository conducteurRepository;
     private final ConducteurMapper conducteurMapper;
 
@@ -29,7 +27,7 @@ public class ConducteurServiceImpl implements ConducteurService{
     public ConducteurResponse create(ConducteurRequest request) {
         if (conducteurRepository.existsByEmail(request.email())) {
             log.warn("Email déjà utilisé: {}", request.email());
-            //throw new DuplicateResourceException("Cet email est déjà utilisé.");
+            throw new DuplicateResourceException("Cet email est déjà utilisé.");
         }
         if (conducteurRepository.existsByNumeroPermis(request.numeroPermis())) {
             log.warn("Numéro de permis déjà utilisé: {}", request.numeroPermis());
@@ -65,7 +63,8 @@ public class ConducteurServiceImpl implements ConducteurService{
             log.warn("Email déjà utilisé lors de la mise à jour: {}", request.email());
             throw new DuplicateResourceException("Cet email est déjà utilisé.");
         }
-        if (!conducteur.getNumeroPermis().equals(request.numeroPermis()) && conducteurRepository.existsByNumeroPermis(request.numeroPermis())) {
+        if (!conducteur.getNumeroPermis().equals(request.numeroPermis())
+                && conducteurRepository.existsByNumeroPermis(request.numeroPermis())) {
             log.warn("Numéro de permis déjà utilisé lors de la mise à jour: {}", request.numeroPermis());
             throw new DuplicateResourceException("Ce numéro de permis est déjà utilisé.");
         }
@@ -78,8 +77,16 @@ public class ConducteurServiceImpl implements ConducteurService{
 
     @Override
     public List<ConducteurResponse> search(String nom, String email) {
-        return conducteurRepository.findByNomContainingIgnoreCaseOrEmailContainingIgnoreCase(
-                nom != null ? nom : "", email != null ? email : ""
-        ).stream().map(conducteurMapper::toResponse).toList();
+        List<Conducteur> resultats;
+        if (nom != null && email != null) {
+            resultats = conducteurRepository.findByNomContainingIgnoreCaseAndEmailContainingIgnoreCase(nom, email);
+        } else if (nom != null) {
+            resultats = conducteurRepository.findByNomContainingIgnoreCase(nom);
+        } else if (email != null) {
+            resultats = conducteurRepository.findByEmailContainingIgnoreCase(email);
+        } else {
+            resultats = conducteurRepository.findAll();
+        }
+        return resultats.stream().map(conducteurMapper::toResponse).toList();
     }
 }

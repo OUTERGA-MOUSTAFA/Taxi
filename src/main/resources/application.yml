@@ -2,7 +2,7 @@ spring:
   application:
     name: covoiturage
   datasource:
-    url: jdbc:postgresql://localhost:5432/covoiturage
+    url: jdbc:postgresql://localhost:5433/covoiturage
     username: covoiturage
     password: covoiturage
     driver-class-name: org.postgresql.Driver
