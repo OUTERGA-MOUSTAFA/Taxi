@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,11 +20,12 @@ import com.taxi.service.ConducteurService;
 import jakarta.validation.Valid;
 
 @RestController 
-@RequestMapping ("/api/conducteurs")
+@RequestMapping("/api/conducteurs")
 public class ConducteurController {
-    
+
     private final ConducteurService conducteurService;
-    public ConducteurController(ConducteurService conducteurService){
+
+    public ConducteurController(ConducteurService conducteurService) {
         this.conducteurService = conducteurService;
     }
 
@@ -47,5 +49,11 @@ public class ConducteurController {
             @RequestParam(required = false) String nom,
             @RequestParam(required = false) String email) {
         return ResponseEntity.ok(conducteurService.search(nom, email));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ConducteurResponse> update(@PathVariable Long id,
+            @RequestBody @Valid ConducteurRequest request) {
+        return ResponseEntity.ok(conducteurService.update(id, request));
     }
 }
