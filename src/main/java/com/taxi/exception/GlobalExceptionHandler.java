@@ -86,7 +86,8 @@ public class GlobalExceptionHandler {
     // 500 : tout le reste
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleAutre(Exception ex) {
-        // Les erreurs de Spring (route inconnue 404, méthode non supportée 405...) gardent leur code
+        // Les erreurs de Spring (route inconnue 404, méthode non supportée 405...)
+        // gardent leur code
         if (ex instanceof ErrorResponse errorResponse) {
             ProblemDetail problemDetail = errorResponse.getBody();
             problemDetail.setProperty("timestamp", Instant.now());
