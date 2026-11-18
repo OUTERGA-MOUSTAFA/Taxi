@@ -1,0 +1,315 @@
+{
+  "info": {
+    "name": "TAXI - Passagers",
+    "description": "Tests du CRUD passager (T2.2). Lancer dans l'ordre ou avec le Runner ; chaque exécution utilise un suffixe unique.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "run",
+      "value": ""
+    },
+    {
+      "key": "salmaId",
+      "value": ""
+    },
+    {
+      "key": "karimId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Créer Salma (201)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('run', Date.now().toString().slice(-6));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+              "const p = pm.response.json();",
+              "pm.test('Un id est renvoyé', () => pm.expect(p.id).to.be.a('number'));",
+              "pm.collectionVariables.set('salmaId', p.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/passagers",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Idrissi\",\n  \"prenom\": \"Salma\",\n  \"email\": \"salma{{run}}@mail.ma\",\n  \"telephone\": \"0611223344\"\n}"
+        }
+      }
+    },
+    {
+      "name": "02 Créer Karim (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('karimId', pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/passagers",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Tazi\",\n  \"prenom\": \"Karim\",\n  \"email\": \"karim{{run}}@mail.ma\",\n  \"telephone\": \"0655667788\"\n}"
+        }
+      }
+    },
+    {
+      "name": "03 Email déjà utilisé (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 409', () => pm.response.to.have.status(409));",
+              "pm.test('Message sur l'email', () => pm.expect(pm.response.json().detail).to.include('email'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/passagers",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Copie\",\n  \"prenom\": \"Email\",\n  \"email\": \"salma{{run}}@mail.ma\",\n  \"telephone\": \"0600000001\"\n}"
+        }
+      }
+    },
+    {
+      "name": "04 Champs invalides (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/passagers",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"\",\n  \"prenom\": \"Test\",\n  \"email\": \"pas-un-email\",\n  \"telephone\": \"0600000002\"\n}"
+        }
+      }
+    },
+    {
+      "name": "05 Lister les passagers (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+              "pm.test('Au moins 2 passagers', () => pm.expect(pm.response.json().length).to.be.at.least(2));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/passagers"
+      }
+    },
+    {
+      "name": "06 Consulter Salma (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+              "pm.test('Bonne passagère', () => pm.expect(pm.response.json().prenom).to.eql('Salma'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/passagers/{{salmaId}}"
+      }
+    },
+    {
+      "name": "07 Passager inexistant (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 404', () => pm.response.to.have.status(404));",
+              "pm.test('ProblemDetail avec message', () => pm.expect(pm.response.json().detail).to.be.a('string'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/passagers/999999"
+      }
+    },
+    {
+      "name": "08 Rechercher par email (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+              "const r = pm.response.json();",
+              "pm.test('Un seul résultat : Salma', () => { pm.expect(r.length).to.eql(1); pm.expect(r[0].prenom).to.eql('Salma'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/passagers/recherche?email=salma{{run}}"
+      }
+    },
+    {
+      "name": "09 Modifier Salma (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+              "pm.test('Téléphone modifié', () => pm.expect(pm.response.json().telephone).to.eql('0699999999'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/passagers/{{salmaId}}",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Idrissi\",\n  \"prenom\": \"Salma\",\n  \"email\": \"salma{{run}}@mail.ma\",\n  \"telephone\": \"0699999999\"\n}"
+        }
+      }
+    },
+    {
+      "name": "10 Modifier avec l'email de Karim (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 409', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/passagers/{{salmaId}}",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Idrissi\",\n  \"prenom\": \"Salma\",\n  \"email\": \"karim{{run}}@mail.ma\",\n  \"telephone\": \"0699999999\"\n}"
+        }
+      }
+    },
+    {
+      "name": "11 Modifier un passager inexistant (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Statut 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/passagers/999999",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nom\": \"Fantome\",\n  \"prenom\": \"Test\",\n  \"email\": \"fantome{{run}}@mail.ma\",\n  \"telephone\": \"0600000003\"\n}"
+        }
+      }
+    }
+  ]
+}
