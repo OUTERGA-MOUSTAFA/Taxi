@@ -15,18 +15,19 @@ import com.taxi.mapper.PassagerMapper;
 import com.taxi.repository.PassagerRepository;
 import com.taxi.service.PassagerService;
 
-@Service 
+@Service
 public class PassagerServiceImpl implements PassagerService {
 
     private static final Logger log = LoggerFactory.getLogger(PassagerServiceImpl.class);
-    
+
     private final PassagerRepository passagerRepository;
     private final PassagerMapper passagerMapper;
 
-    public PassagerServiceImpl(PassagerRepository passagerRepository, PassagerMapper passagerMapper){
+    public PassagerServiceImpl(PassagerRepository passagerRepository, PassagerMapper passagerMapper) {
         this.passagerRepository = passagerRepository;
         this.passagerMapper = passagerMapper;
     }
+
     @Override
     public PassagerResponse create(PassagerRequest request) {
         if (passagerRepository.existsByEmail(request.email())) {
@@ -61,7 +62,8 @@ public class PassagerServiceImpl implements PassagerService {
 
         if (!passager.getEmail().equals(request.email()) && passagerRepository.existsByEmail(request.email())) {
             log.warn("Email déjà utilisé lors de la mise à jour du passager: {}", request.email());
-            throw new DuplicateResourceException("Cet email est déjà utilisé.");
+            throw new DuplicateResourceException(
+                    "L'email " + request.email() + " est déjà utilisé par un autre passager.");
         }
 
         passagerMapper.updateEntity(request, passager);
