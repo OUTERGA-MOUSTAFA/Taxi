@@ -1,5 +1,7 @@
 package com.taxi.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,10 +21,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping ("/api/vehicules")
-@RequiredArgsConstructor 
+@RequestMapping("/api/vehicules")
+@RequiredArgsConstructor
 public class VehiculeController {
-    
+
     private final VehiculeService vehiculeService;
 
     @PostMapping
@@ -44,5 +46,11 @@ public class VehiculeController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         vehiculeService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    //Lister les véhicules d’un conducteur
+    @GetMapping("/conducteur/{conducteurId}")
+    public ResponseEntity<List<VehiculeResponse>> getByConducteur(@PathVariable Long conducteurId) {
+        return ResponseEntity.ok(vehiculeService.findByConducteurId(conducteurId));
     }
 }
