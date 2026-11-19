@@ -9,4 +9,5 @@ public record VehiculeResponse(
     int capacite,
     Long conducteurId,
     String conducteurNom
+    
 ) {}

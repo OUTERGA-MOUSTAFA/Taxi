@@ -23,4 +23,5 @@ public record VehiculeRequest(
 
     @NotNull (message = "L'identifiant du conducteur est obligatoire")
     Long conducteurId
+    
 ) {}

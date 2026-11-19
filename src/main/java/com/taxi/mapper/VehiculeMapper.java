@@ -17,7 +17,7 @@ public interface VehiculeMapper {
 
     @Mapping(source = "conducteur.id", target = "conducteurId")
     @Mapping(source = "conducteur.nom", target = "conducteurNom")
-    VehiculeResponse toResponse(Vehicule vehicule);
+    VehiculeResponse toResponse(Vehicule vehicule);//  return new VehiculeResponse( id, marque, modele, immatriculation, couleur, capacite, conducteurId, conducteurNom );
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "conducteur", ignore = true)

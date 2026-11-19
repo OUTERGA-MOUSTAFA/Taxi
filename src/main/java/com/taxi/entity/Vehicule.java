@@ -40,9 +40,10 @@ public class Vehicule {
     private String couleur;
 
     @Column(nullable = false)
-    private int capacite;
+    private Integer capacite;
 
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
     @JoinColumn (name = "conducteur_id", nullable = false)
     private Conducteur conducteur;
+
 }
