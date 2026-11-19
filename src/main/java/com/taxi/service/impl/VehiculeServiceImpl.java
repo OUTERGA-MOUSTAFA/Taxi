@@ -109,7 +109,7 @@ public class VehiculeServiceImpl implements VehiculeService {
         Vehicule vehicule = vehiculeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Véhicule non trouvé avec l'id: " + id));
 
-        // vérification dès que TrajetRepository existe :
+        // vérification dès que TrajetRepository existe
         // if (trajetRepository.existsByVehiculeId(id)) {
         // log.warn("Suppression refusée : véhicule id={} lié à au moins un trajet",
         // id);
