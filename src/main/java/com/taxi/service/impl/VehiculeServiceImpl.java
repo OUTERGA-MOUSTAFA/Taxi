@@ -22,10 +22,9 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class VehiculeServiceImpl implements VehiculeService {
 
-     private static final Logger log = LoggerFactory.getLogger(PassagerServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(PassagerServiceImpl.class);
 
     private final VehiculeRepository vehiculeRepository;
     private final ConducteurRepository conducteurRepository;
@@ -53,7 +52,15 @@ public class VehiculeServiceImpl implements VehiculeService {
         return vehiculeMapper.toResponse(saved);
     }
 
+    // @Override
+    // public VehiculeResponse findById(Long id) {
+    // Vehicule vehicule = vehiculeRepository.findById(id)
+    // .orElseThrow(() -> new ResourceNotFoundException("Véhicule non trouvé avec
+    // l'id: " + id));
+    // return vehiculeMapper.toResponse(vehicule);
+    // }
     @Override
+    @Transactional(readOnly = true)// bash nkhli connexion mefteha hta ila 3eytna 3la toResponse li f mapper itdar select hta hewa
     public VehiculeResponse findById(Long id) {
         Vehicule vehicule = vehiculeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Véhicule non trouvé avec l'id: " + id));
@@ -102,7 +109,7 @@ public class VehiculeServiceImpl implements VehiculeService {
         Vehicule vehicule = vehiculeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Véhicule non trouvé avec l'id: " + id));
 
-        // TODO (E4): activer cette vérification dès que TrajetRepository existe :
+        // vérification dès que TrajetRepository existe :
         // if (trajetRepository.existsByVehiculeId(id)) {
         // log.warn("Suppression refusée : véhicule id={} lié à au moins un trajet",
         // id);
