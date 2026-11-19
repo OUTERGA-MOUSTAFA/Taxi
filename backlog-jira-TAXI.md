@@ -146,7 +146,7 @@
 
 **Sous-tâches :**
 - **S3.1.1 — Entité Vehicule** — colonnes, contrainte unique sur `immatriculation`, `@ManyToOne(fetch = LAZY) Conducteur`.
-- **S3.1.2 — DTOs + mapper** — `VehiculeRequest` (avec `conducteurId`), `VehiculeResponse` (avec le nom du conducteur), `VehiculeMapper`.
+- **S3.1.2 — DTOs + mapper** — 
 - **S3.1.3 — Repository** — `findByConducteurId`, `existsByImmatriculation`.
 
 ### T3.2 — Endpoints véhicules (3 pts)
@@ -161,7 +161,7 @@
 **Sous-tâches :**
 - **S3.2.1 — Service véhicule** — création liée à un conducteur existant (404 sinon), modification, listing par conducteur.
 - **S3.2.2 — Suppression conditionnelle** — prévoir l'appel à `trajetRepository.existsByVehiculeId` (à brancher dans E4) ; en attendant, supprimer librement.
-- **S3.2.3 — Controller + Postman** — les 5 endpoints + cas 400 (capacité 9) et 409 (immatriculation en double).
+- **S3.2.3 — Controller + Postman** — les 5 e`VehiculeRequest` (avec `conducteurId`), `VehiculeResponse` (avec le nom du conducteur), `VehiculeMapper`.ndpoints + cas 400 (capacité 9) et 409 (immatriculation en double).
 
 ---
 
