@@ -70,12 +70,12 @@ public class TrajetServiceImpl implements TrajetService{
             trajet.addPointArret(point);
         }
 
-        PointArretRequest premierPoint = points.get(0);
+        PointArretRequest premierPoint = points.get(0);// firt point d'arret
         PointArretRequest dernierPoint = points.get(points.size() - 1);
 
-        trajet.setVilleDepart(premierPoint.ville().trim());
-        trajet.setVilleArrivee(dernierPoint.ville().trim());
-        trajet.setDateDepart(premierPoint.heurePassage());
+        trajet.setVilleDepart(premierPoint.ville().trim()); // villeDepart
+        trajet.setVilleArrivee(dernierPoint.ville().trim());//villeArrivee
+        trajet.setDateDepart(premierPoint.heurePassage());// dateDepart
 
         Trajet saved = trajetRepository.save(trajet);
         log.info("Trajet publié id={}", saved.getId());
@@ -91,7 +91,7 @@ public class TrajetServiceImpl implements TrajetService{
         }
     }
 
-    private void verifierPoints(List<PointArretRequest> points) {
+    private void verifierPoints(List<PointArretRequest> points) {// villeDepart
         if (points == null || points.size() < 2) {
             log.warn("Règle refusée (400) : un trajet doit comporter au moins 2 points d'arrêt");
             throw new BadRequestException("Un trajet doit contenir au moins 2 points d'arrêt.");

@@ -30,13 +30,13 @@ public class Trajet {
     private Vehicule vehicule;
 
     @Column(nullable = false)
-    private String villeDepart;
+    private String villeDepart;//villeDepart
 
     @Column(nullable = false)
-    private String villeArrivee;
+    private String villeArrivee;//villeArrivee
 
     @Column(nullable = false)
-    private LocalDateTime dateDepart;
+    private LocalDateTime dateDepart;//dateDepart
 
     @Column(nullable = false)
     private int placesProposees;
@@ -49,7 +49,7 @@ public class Trajet {
     @OneToMany(mappedBy = "trajet", cascade = CascadeType.ALL/* composition */, orphanRemoval = true)
     @OrderBy("ordre ASC") // composition
     @Builder.Default
-    private List<PointArret> pointsArret = new ArrayList<>();
+    private List<PointArret> pointsArret = new ArrayList<>();// les point d'arret
 
     public void addPointArret(PointArret point) {
         pointsArret.add(point);
