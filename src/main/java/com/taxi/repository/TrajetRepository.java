@@ -13,16 +13,26 @@ import com.taxi.entity.Trajet;
 
 @Repository
 public interface TrajetRepository extends JpaRepository<Trajet, Long> {
+
     // List<Trajet> findByConducteurId(Long conducteurId);
     // boolean existsByVehiculeId(Long vehiculeId);
 
-    // kelshi 3la dik distinct => repitation dyale les trajets ila kan ande les pointes d'arret mli kan khdeme b join fetch
+    // Détail d'un trajet en une seule requête
+    // kelshi 3l a dik distinct=> repitation dyale les trajets ila kan ande les
+    // pointes d'arret mli kan khdeme b join fetch
+    @Query("select distinct t from Trajet t " + "join fetch t.pointsArret " + "join fetch t.conducteur "
+            + "join fetch t.vehicule " + "where t.id = :id")
+
+    Optional<Trajet> findDetailById(@Param("id") Long id);
+
+    // Trajets d'un conducteur sans N+1
     @Query("select distinct t from Trajet t " +
-           "join fetch t.pointsArret " +
-           "join fetch t.conducteur " +
-           "join fetch t.vehicule " +
-           "where t.id = :id")
-    Optional<Trajet> findDetailById(@Param ("id") Long id);
+            "join fetch t.pointsArret " +
+            "join fetch t.conducteur " +
+            "join fetch t.vehicule " +
+            "where t.conducteur.id = :conducteurId " +
+            "order by t.dateDepart")
+    List<Trajet> findDetailByConducteurId(@Param("conducteurId") Long conducteurId);
 
     List<Trajet> findByConducteurId(Long conducteurId);
 

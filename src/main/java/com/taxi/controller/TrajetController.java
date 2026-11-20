@@ -36,8 +36,8 @@ public class TrajetController {
         return ResponseEntity.ok(trajetService.findById(id));
     }
 
-    @GetMapping("conducteurs/{id}/trajets")
-    public ResponseEntity<List<TrajetResponse>> getTrajetsByConducteur(@PathVariable Long id) {
-        return ResponseEntity.ok(trajetService.findByConducteurId(id));
-    }
+    // @GetMapping("conducteurs/{id}/trajets")
+    // public ResponseEntity<List<TrajetResponse>> getTrajetsByConducteur(@PathVariable Long id) {
+    //     return ResponseEntity.ok(trajetService.findByConducteurId(id));
+    // }
 }

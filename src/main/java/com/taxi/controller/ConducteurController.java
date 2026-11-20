@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taxi.dto.ConducteurRequest;
 import com.taxi.dto.ConducteurResponse;
+import com.taxi.dto.TrajetResponse;
 import com.taxi.service.ConducteurService;
+import com.taxi.service.TrajetService;
 
 import jakarta.validation.Valid;
 
@@ -24,9 +26,11 @@ import jakarta.validation.Valid;
 public class ConducteurController {
 
     private final ConducteurService conducteurService;
-
-    public ConducteurController(ConducteurService conducteurService) {
+    private final TrajetService trajetService; 
+    public ConducteurController(ConducteurService conducteurService, TrajetService trajetService) {
         this.conducteurService = conducteurService;
+        this.trajetService = trajetService;
+        
     }
 
     @PostMapping
@@ -58,5 +62,9 @@ public class ConducteurController {
     }
 
 
-    
+
+@GetMapping("/{id}/trajets")
+public ResponseEntity<List<TrajetResponse>> getTrajets(@PathVariable Long id) {
+    return ResponseEntity.ok(trajetService.findByConducteurId(id));
+}
 }

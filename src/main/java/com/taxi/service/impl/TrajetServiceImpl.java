@@ -174,7 +174,7 @@ public class TrajetServiceImpl implements TrajetService {
             throw new ResourceNotFoundException("Conducteur non trouvé avec l'id: " + conducteurId);
         }
 
-        return trajetRepository.findByConducteurId(conducteurId).stream()
+        return trajetRepository.findDetailByConducteurId(conducteurId).stream() // hna fash kayn changement
                 .map(this::buildTrajetResponse)
                 .toList();
     }
