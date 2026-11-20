@@ -1,0 +1,316 @@
+{
+  "info": {
+    "name": "TAXI - Véhicules",
+    "description": "Tests du CRUD véhicule (T3.1, T3.2). Les deux premières requêtes créent les conducteurs Hamid et Youssef, donc la collection marche seule. Lancer les requêtes dans l'ordre, ou toute la collection avec le Runner. Chaque exécution utilise un suffixe unique, donc la collection peut être relancée sans vider la base.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "run", "value": "" },
+    { "key": "hamidId", "value": "" },
+    { "key": "youssefId", "value": "" },
+    { "key": "vehiculeId", "value": "" },
+    { "key": "vehiculeYoussefId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "00 Préparer : créer Hamid (201)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.collectionVariables.set('run', Date.now().toString().slice(-6));"
+          ] }
+        },
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('hamidId', pm.response.json().id);"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Alaoui\",\n  \"prenom\": \"Hamid\",\n  \"email\": \"hamid{{run}}@taxi.ma\",\n  \"telephone\": \"0612345678\",\n  \"numeroPermis\": \"PH{{run}}\"\n}" }
+      }
+    },
+    {
+      "name": "00 Préparer : créer Youssef (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('youssefId', pm.response.json().id);"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/conducteurs",
+        "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Bennani\",\n  \"prenom\": \"Youssef\",\n  \"email\": \"youssef{{run}}@taxi.ma\",\n  \"telephone\": \"0698765432\",\n  \"numeroPermis\": \"PY{{run}}\"\n}" }
+      }
+    },
+    {
+      "name": "01 Créer la Logan de Hamid (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+            "const v = pm.response.json();",
+            "pm.test('Un id est renvoyé', () => pm.expect(v.id).to.be.a('number'));",
+            "pm.test('Le véhicule appartient à Hamid', () => { pm.expect(v.conducteurId).to.eql(Number(pm.collectionVariables.get('hamidId'))); pm.expect(v.conducteurNom).to.eql('Alaoui'); });",
+            "pm.collectionVariables.set('vehiculeId', v.id);"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Dacia\",\n  \"modele\": \"Logan\",\n  \"immatriculation\": \"{{run}}-A-6\",\n  \"couleur\": \"Blanc\",\n  \"capacite\": 4,\n  \"conducteurId\": {{hamidId}}\n}" }
+      }
+    },
+    {
+      "name": "02 Créer la Clio de Youssef (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+            "pm.collectionVariables.set('vehiculeYoussefId', pm.response.json().id);"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Renault\",\n  \"modele\": \"Clio\",\n  \"immatriculation\": \"{{run}}-B-1\",\n  \"couleur\": \"Noir\",\n  \"capacite\": 4,\n  \"conducteurId\": {{youssefId}}\n}" }
+      }
+    },
+    {
+      "name": "03 Immatriculation déjà utilisée (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 409', () => pm.response.to.have.status(409));",
+            "pm.test('Message sur l\\'immatriculation', () => pm.expect(pm.response.json().detail).to.include('immatriculation'));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Dacia\",\n  \"modele\": \"Sandero\",\n  \"immatriculation\": \"{{run}}-A-6\",\n  \"couleur\": \"Rouge\",\n  \"capacite\": 4,\n  \"conducteurId\": {{hamidId}}\n}" }
+      }
+    },
+    {
+      "name": "04 Capacité trop grande (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 400', () => pm.response.to.have.status(400));",
+            "pm.test('Erreur sur capacite', () => pm.expect(pm.response.json().erreurs).to.have.property('capacite'));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Mercedes\",\n  \"modele\": \"Sprinter\",\n  \"immatriculation\": \"{{run}}-C-9\",\n  \"couleur\": \"Gris\",\n  \"capacite\": 9,\n  \"conducteurId\": {{hamidId}}\n}" }
+      }
+    },
+    {
+      "name": "05 Champs obligatoires vides (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 400', () => pm.response.to.have.status(400));",
+            "const e = pm.response.json().erreurs;",
+            "pm.test('Erreurs sur marque, modele et immatriculation', () => { pm.expect(e).to.have.property('marque'); pm.expect(e).to.have.property('modele'); pm.expect(e).to.have.property('immatriculation'); });"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"\",\n  \"modele\": \"\",\n  \"immatriculation\": \"\",\n  \"capacite\": 4,\n  \"conducteurId\": {{hamidId}}\n}" }
+      }
+    },
+    {
+      "name": "06 Créer avec un conducteur inexistant (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 404', () => pm.response.to.have.status(404));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Dacia\",\n  \"modele\": \"Logan\",\n  \"immatriculation\": \"{{run}}-D-1\",\n  \"couleur\": \"Blanc\",\n  \"capacite\": 4,\n  \"conducteurId\": 999999\n}" }
+      }
+    },
+    {
+      "name": "07 Consulter la Logan (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+            "pm.test('Nom du conducteur présent', () => pm.expect(pm.response.json().conducteurNom).to.eql('Alaoui'));"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}" }
+    },
+    {
+      "name": "08 Véhicule inexistant (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 404', () => pm.response.to.have.status(404));",
+            "const p = pm.response.json();",
+            "pm.test('ProblemDetail avec message et timestamp', () => { pm.expect(p.detail).to.be.a('string'); pm.expect(p.timestamp).to.exist; });"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/vehicules/999999" }
+    },
+    {
+      "name": "09 Lister les véhicules de Hamid (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Un seul véhicule, la Logan', () => { pm.expect(r.length).to.eql(1); pm.expect(r[0].modele).to.eql('Logan'); });"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/vehicules/conducteur/{{hamidId}}" }
+    },
+    {
+      "name": "10 Lister les véhicules d'un conducteur inexistant (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 404', () => pm.response.to.have.status(404));"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/vehicules/conducteur/999999" }
+    },
+    {
+      "name": "11 Modifier la couleur de la Logan (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+            "pm.test('Couleur modifiée', () => pm.expect(pm.response.json().couleur).to.eql('Gris'));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Dacia\",\n  \"modele\": \"Logan\",\n  \"immatriculation\": \"{{run}}-A-6\",\n  \"couleur\": \"Gris\",\n  \"capacite\": 4,\n  \"conducteurId\": {{hamidId}}\n}" }
+      }
+    },
+    {
+      "name": "12 Modifier avec l'immatriculation de la Clio (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 409', () => pm.response.to.have.status(409));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Dacia\",\n  \"modele\": \"Logan\",\n  \"immatriculation\": \"{{run}}-B-1\",\n  \"couleur\": \"Gris\",\n  \"capacite\": 4,\n  \"conducteurId\": {{hamidId}}\n}" }
+      }
+    },
+    {
+      "name": "13 Donner la Logan à Youssef (403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 403', () => pm.response.to.have.status(403));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Dacia\",\n  \"modele\": \"Logan\",\n  \"immatriculation\": \"{{run}}-A-6\",\n  \"couleur\": \"Gris\",\n  \"capacite\": 4,\n  \"conducteurId\": {{youssefId}}\n}" }
+      }
+    },
+    {
+      "name": "14 Modifier avec un conducteur inexistant (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 404', () => pm.response.to.have.status(404));"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}",
+        "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Dacia\",\n  \"modele\": \"Logan\",\n  \"immatriculation\": \"{{run}}-A-6\",\n  \"couleur\": \"Gris\",\n  \"capacite\": 4,\n  \"conducteurId\": 999999\n}" }
+      }
+    },
+    {
+      "name": "15 Supprimer la Logan (204)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 204', () => pm.response.to.have.status(204));"
+          ] }
+        }
+      ],
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}" }
+    },
+    {
+      "name": "16 Consulter la Logan supprimée (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Statut 404', () => pm.response.to.have.status(404));"
+          ] }
+        }
+      ],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/vehicules/{{vehiculeId}}" }
+    }
+  ]
+}

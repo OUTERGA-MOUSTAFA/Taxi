@@ -97,4 +97,10 @@ public class GlobalExceptionHandler {
         return probleme(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur interne", "internal",
                 "Une erreur interne est survenue. Réessayez plus tard.");
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ProblemDetail handleBadRequest(BadRequestException ex) {
+        return probleme(HttpStatus.BAD_REQUEST, "Requête invalide", "requete-invalide", ex.getMessage());
+    }
+
 }
