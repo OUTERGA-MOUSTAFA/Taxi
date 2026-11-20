@@ -97,4 +97,20 @@ public class GlobalExceptionHandler {
         return probleme(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur interne", "internal",
                 "Une erreur interne est survenue. Réessayez plus tard.");
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ProblemDetail handleBadRequestException(BadRequestException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setTitle("Requête invalide");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail; // 400
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ProblemDetail handleForbiddenException(ForbiddenException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problemDetail.setTitle("Accès refusé");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail; // 403
+    }
 }
