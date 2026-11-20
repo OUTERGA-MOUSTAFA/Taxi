@@ -77,10 +77,11 @@ public class TrajetServiceImpl implements TrajetService {
         trajet.setVilleArrivee(dernierPoint.ville().trim());// villeArrivee
         trajet.setDateDepart(premierPoint.heurePassage());// dateDepart
 
+        // return trajetMapper.toResponse(saved);
         Trajet saved = trajetRepository.save(trajet);
         log.info("Trajet publié id={}", saved.getId());
 
-        return trajetMapper.toResponse(saved);
+        return buildTrajetResponse(saved);
     }
 
     private void verifierProprietaireVehicule(Conducteur conducteur, Vehicule vehicule) {
