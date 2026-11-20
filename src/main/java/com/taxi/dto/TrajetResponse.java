@@ -15,6 +15,7 @@ public record TrajetResponse(
     String villeArrivee,
     LocalDateTime dateDepart,
     int placesProposees,
+    int placesRestantes, // kaythseb f Service o makaynsh f entity
     StatutTrajet statut,
     List<PointArretResponse> pointsArret
 ) {}

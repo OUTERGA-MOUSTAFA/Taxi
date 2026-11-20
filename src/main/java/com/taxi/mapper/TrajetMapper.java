@@ -1,4 +1,5 @@
 package com.taxi.mapper;
+
 import com.taxi.dto.PointArretRequest;
 import com.taxi.dto.PointArretResponse;
 import com.taxi.dto.TrajetRequest;
@@ -31,5 +32,6 @@ public interface TrajetMapper {
     @Mapping(source = "conducteur.nom", target = "conducteurNom")
     @Mapping(source = "vehicule.id", target = "vehiculeId")
     @Mapping(source = "vehicule.immatriculation", target = "vehiculeImmatriculation")
+    @Mapping(target = "placesRestantes", ignore = true)// hna kangole l mapStruct ha hewa mat mshish t9elbi 3lih f class Trajet
     TrajetResponse toResponse(Trajet trajet);
 }
