@@ -19,21 +19,20 @@ import com.taxi.entity.Trajet;
 import com.taxi.entity.Vehicule;
 import com.taxi.enums.StatutTrajet;
 import com.taxi.exception.BadRequestException;
-import com.taxi.exception.ForbiddenException;
+import com.taxi.exception.ForbiddenActionException;
 import com.taxi.exception.ResourceNotFoundException;
 import com.taxi.mapper.TrajetMapper;
 import com.taxi.repository.ConducteurRepository;
 import com.taxi.repository.TrajetRepository;
 import com.taxi.repository.VehiculeRepository;
 import com.taxi.service.TrajetService;
-
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class TrajetServiceImpl implements TrajetService{
-    private static final Logger log = LoggerFactory.getLogger(PassagerServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TrajetServiceImpl.class);
 
     private final TrajetRepository trajetRepository;
     private final ConducteurRepository conducteurRepository;
@@ -87,7 +86,7 @@ public class TrajetServiceImpl implements TrajetService{
         if (!vehicule.getConducteur().getId().equals(conducteur.getId())) {
             log.warn("Règle refusée (403) : le véhicule id={} n'appartient pas au conducteur id={}",
                     vehicule.getId(), conducteur.getId());
-            throw new ForbiddenException("Le véhicule spécifié n'appartient pas à ce conducteur.");
+            throw new ForbiddenActionException("Le véhicule spécifié n'appartient pas à ce conducteur.");
         }
     }
 

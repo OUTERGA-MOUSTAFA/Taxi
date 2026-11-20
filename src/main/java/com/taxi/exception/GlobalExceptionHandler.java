@@ -99,18 +99,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ProblemDetail handleBadRequestException(BadRequestException ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-        problemDetail.setTitle("Requête invalide");
-        problemDetail.setProperty("timestamp", Instant.now());
-        return problemDetail; // 400
+    public ProblemDetail handleBadRequest(BadRequestException ex) {
+        return probleme(HttpStatus.BAD_REQUEST, "Requête invalide", "requete-invalide", ex.getMessage());
     }
 
-    @ExceptionHandler(ForbiddenException.class)
-    public ProblemDetail handleForbiddenException(ForbiddenException ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
-        problemDetail.setTitle("Accès refusé");
-        problemDetail.setProperty("timestamp", Instant.now());
-        return problemDetail; // 403
-    }
 }
