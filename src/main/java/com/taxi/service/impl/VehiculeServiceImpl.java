@@ -11,11 +11,13 @@ import com.taxi.dto.VehiculeRequest;
 import com.taxi.dto.VehiculeResponse;
 import com.taxi.entity.Conducteur;
 import com.taxi.entity.Vehicule;
+import com.taxi.exception.BusinessRuleException;
 import com.taxi.exception.DuplicateResourceException;
 import com.taxi.exception.ForbiddenActionException;
 import com.taxi.exception.ResourceNotFoundException;
 import com.taxi.mapper.VehiculeMapper;
 import com.taxi.repository.ConducteurRepository;
+import com.taxi.repository.TrajetRepository;
 import com.taxi.repository.VehiculeRepository;
 import com.taxi.service.VehiculeService;
 
@@ -30,10 +32,12 @@ public class VehiculeServiceImpl implements VehiculeService {
     private final VehiculeRepository vehiculeRepository;
     private final ConducteurRepository conducteurRepository;
     private final VehiculeMapper vehiculeMapper;
+    private final TrajetRepository trajetRepository;
 
     @Override
     @Transactional
     public VehiculeResponse create(VehiculeRequest request) {
+
         Conducteur conducteur = conducteurRepository.findById(request.conducteurId())
                 .orElseThrow(() -> {
                     log.warn("Conducteur introuvable lors de la création du véhicule id={}", request.conducteurId());
@@ -60,6 +64,7 @@ public class VehiculeServiceImpl implements VehiculeService {
     // l'id: " + id));
     // return vehiculeMapper.toResponse(vehicule);
     // }
+
     @Override
     @Transactional(readOnly = true) // bash nkhli connexion mefteha hta ila 3eytna 3la toResponse li f mapper itdar
                                     // select hta hewa
@@ -123,13 +128,10 @@ public class VehiculeServiceImpl implements VehiculeService {
         Vehicule vehicule = vehiculeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Véhicule non trouvé avec l'id: " + id));
 
-        // vérification dès que TrajetRepository existe
-        // if (trajetRepository.existsByVehiculeId(id)) {
-        // log.warn("Suppression refusée : véhicule id={} lié à au moins un trajet",
-        // id);
-        // throw new DuplicateResourceException("Impossible de supprimer ce véhicule car
-        // il est lié à un trajet.");
-        // }
+        if (trajetRepository.existsByVehiculeId(id)) {
+            log.warn("Suppression refusée : véhicule id={} lié à au moins un trajet", id);
+            throw new BusinessRuleException("Impossible de supprimer ce véhicule car il est lié à un trajet.");
+        }
 
         vehiculeRepository.delete(vehicule);
         log.info("Véhicule supprimé id={}", id);

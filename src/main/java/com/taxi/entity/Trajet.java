@@ -4,18 +4,20 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.taxi.enums.StatutTrajet;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@NoArgsConstructor 
-@AllArgsConstructor 
-@Getter 
-@Setter 
-@Builder 
-@Table (name = "trajets")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
+@Table(name = "trajets")
 public class Trajet {
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -42,10 +44,10 @@ public class Trajet {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private StatutTrajet statut = StatutTrajet.PLANIFIE;
+    private StatutTrajet statut = StatutTrajet.PUBLIE;
 
-    @OneToMany(mappedBy = "trajet", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("ordre ASC")
+    @OneToMany(mappedBy = "trajet", cascade = CascadeType.ALL/* composition */, orphanRemoval = true)
+    @OrderBy("ordre ASC") // composition
     @Builder.Default
     private List<PointArret> pointsArret = new ArrayList<>();
 
