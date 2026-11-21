@@ -1,6 +1,7 @@
 package com.taxi.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -8,10 +9,13 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.taxi.dto.PointArretRequest;
 import com.taxi.dto.PointArretResponse;
+import com.taxi.dto.TrajetRechercheResponse;
 import com.taxi.dto.TrajetRequest;
 import com.taxi.dto.TrajetResponse;
 import com.taxi.entity.Conducteur;
@@ -242,5 +246,39 @@ public class TrajetServiceImpl implements TrajetService {
         trajet.setStatut(StatutTrajet.TERMINE);
         trajetRepository.save(trajet);
         log.info("Trajet terminé id={}", id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<TrajetRechercheResponse> rechercherTrajets(
+            String villeDepart,
+            String villeArrivee,
+            LocalDate date,
+            int places,
+            BigDecimal prixMax,
+            Pageable pageable) {
+
+        if (villeDepart == null || villeDepart.isBlank() || villeArrivee == null || villeArrivee.isBlank()) {
+            throw new BadRequestException("Les villes de départ et d'arrivée sont obligatoires.");
+        }
+        if (date == null) {
+            throw new BadRequestException("La date de recherche est obligatoire.");
+        }
+        if (places < 1) {
+            throw new BadRequestException("Le nombre de places doit être au moins de 1.");
+        }
+
+        LocalDateTime debutJour = date.atStartOfDay();
+        LocalDateTime finJour = date.plusDays(1).atStartOfDay();
+
+        return trajetRepository.rechercherTrajets(
+                villeDepart.trim(),
+                villeArrivee.trim(),
+                debutJour,
+                finJour,
+                places,
+                prixMax,
+                StatutTrajet.PUBLIE,
+                pageable);
     }
 }
