@@ -65,7 +65,7 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
                 "  and lower(pd.ville) = lower(:villeArrivee) " +
                 "  and t.statut = :statut " +
                 "  and pm.heurePassage >= :debutJour and pm.heurePassage < :finJour " + //date du départ b seway3 o nhar
-                "and (cast(t.placesProposees as Long)) >= :places"+
+                "  and cast(t.placesProposees as Long) >= :places " +
                 // "  and (t.placesProposees - coalesce((select sum(r.nombrePlaces) from Reservation r where r.trajet = t and r.statut = com.taxi.enums.StatutReservation.CONFIRMEE), 0)) >= :places " +
                 "  and (:prixMax is null or (pd.prixDepuisDepart - pm.prixDepuisDepart) <= :prixMax) " +
                 "order by t.dateDepart asc",
