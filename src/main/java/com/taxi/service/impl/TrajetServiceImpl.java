@@ -258,20 +258,31 @@ public class TrajetServiceImpl implements TrajetService {
             BigDecimal prixMax,
             Pageable pageable) {
 
-        if (villeDepart == null || villeDepart.isBlank() || villeArrivee == null || villeArrivee.isBlank()) {
-            throw new BadRequestException("Les villes de départ et d'arrivée sont obligatoires.");
+        if (villeDepart == null || villeDepart.isBlank()) {
+            log.warn("Recherche refusée (400) : villeDepart manquante");
+            throw new BadRequestException("La ville de départ est obligatoire.");
+        }
+        if (villeArrivee == null || villeArrivee.isBlank()) {
+            log.warn("Recherche refusée (400) : villeArrivee manquante");
+            throw new BadRequestException("La ville d'arrivée est obligatoire.");
         }
         if (date == null) {
+            log.warn("Recherche refusée (400) : date manquante");
             throw new BadRequestException("La date de recherche est obligatoire.");
         }
         if (places < 1) {
-            throw new BadRequestException("Le nombre de places doit être au moins de 1.");
+            log.warn("Recherche refusée (400) : nombre de places invalide ({})", places);
+            throw new BadRequestException("Le nombre de places doit être supérieur ou égal à 1.");
+        }
+        if (prixMax != null && prixMax.compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("Recherche refusée (400) : prixMax négatif ({})", prixMax);
+            throw new BadRequestException("Le prix maximum ne peut pas être négatif.");
         }
 
         LocalDateTime debutJour = date.atStartOfDay();
         LocalDateTime finJour = date.plusDays(1).atStartOfDay();
 
-        return trajetRepository.rechercherTrajets(
+        Page<TrajetRechercheResponse> resultats = trajetRepository.rechercherTrajets(
                 villeDepart.trim(),
                 villeArrivee.trim(),
                 debutJour,
@@ -280,5 +291,10 @@ public class TrajetServiceImpl implements TrajetService {
                 prixMax,
                 StatutTrajet.PUBLIE,
                 pageable);
+
+        log.info("Recherche trajets {} -> {} le {} (places={}) : {} résultat(s)",
+                villeDepart.trim(), villeArrivee.trim(), date, places, resultats.getTotalElements());
+
+        return resultats;
     }
 }

@@ -53,12 +53,13 @@ public class TrajetController {
     public ResponseEntity<Page<TrajetRechercheResponse>> rechercher(
             @RequestParam String villeDepart,
             @RequestParam String villeArrivee,
-            @RequestParam @DateTimeFormat (iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(defaultValue = "1") int places,
             @RequestParam(required = false) BigDecimal prixMax,
-            @PageableDefault (size = 10) Pageable pageable) {
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
-        return ResponseEntity.ok(//200 OK
-                trajetService.rechercherTrajets(villeDepart, villeArrivee, date, places, prixMax, pageable));
+        Page<TrajetRechercheResponse> page = trajetService.rechercherTrajets(
+                villeDepart, villeArrivee, date, places, prixMax, pageable);
+        return ResponseEntity.ok(page);// 200 ok
     }
 }
