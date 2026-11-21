@@ -21,7 +21,11 @@ public interface TrajetService {
 
     void terminerTrajet(Long id, Long conducteurId);
 
-    Page<TrajetRechercheResponse> rechercherTrajets(String villeDepart, String villeArrivee, LocalDate date, int places,
+    Page<TrajetRechercheResponse> rechercherTrajets(
+            String villeDepart,
+            String villeArrivee,
+            LocalDate date,
+            int places,
             BigDecimal prixMax,
             Pageable pageable);
 }
