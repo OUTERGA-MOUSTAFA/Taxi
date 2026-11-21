@@ -1,7 +1,11 @@
 package com.taxi.controller;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
+import org.springframework.data.domain.*;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.taxi.dto.TrajetRechercheResponse;
 import com.taxi.dto.TrajetRequest;
 import com.taxi.dto.TrajetResponse;
 import com.taxi.service.TrajetService;
@@ -30,17 +35,30 @@ public class TrajetController {
     @PostMapping
     public ResponseEntity<TrajetResponse> publierTrajet(@RequestBody @Valid TrajetRequest request) {
         TrajetResponse response = trajetService.publierTrajet(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);// 201 Created
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TrajetResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(trajetService.findById(id));
+        return ResponseEntity.ok(trajetService.findById(id));// 200 OK
     }
 
     @PatchMapping("/{id}/terminer")
-    public ResponseEntity<Void> terminerTrajet( @PathVariable Long id, @RequestParam Long conducteurId) {
+    public ResponseEntity<Void> terminerTrajet(@PathVariable Long id, @RequestParam Long conducteurId) {
         trajetService.terminerTrajet(id, conducteurId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();// 204 No Content
+    }
+
+    @GetMapping("/recherche")
+    public ResponseEntity<Page<TrajetRechercheResponse>> rechercher(
+            @RequestParam String villeDepart,
+            @RequestParam String villeArrivee,
+            @RequestParam @DateTimeFormat (iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "1") int places,
+            @RequestParam(required = false) BigDecimal prixMax,
+            @PageableDefault (size = 10) Pageable pageable) {
+
+        return ResponseEntity.ok(//200 OK
+                trajetService.rechercherTrajets(villeDepart, villeArrivee, date, places, prixMax, pageable));
     }
 }

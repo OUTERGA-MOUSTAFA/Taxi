@@ -35,36 +35,36 @@ public class ConducteurController {
 
     @PostMapping
     public ResponseEntity<ConducteurResponse> create(@RequestBody @Valid ConducteurRequest request) {
-        return new ResponseEntity<>(conducteurService.create(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(conducteurService.create(request), HttpStatus.CREATED);// Created 201
     }
 
     @GetMapping
     public ResponseEntity<List<ConducteurResponse>> getAll() {
-        return ResponseEntity.ok(conducteurService.findAll());
+        return ResponseEntity.ok(conducteurService.findAll());// 200 OK
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ConducteurResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(conducteurService.findById(id));
+        return ResponseEntity.ok(conducteurService.findById(id));// 200 OK
     }
 
     @GetMapping("/recherche")
     public ResponseEntity<List<ConducteurResponse>> search(
             @RequestParam(required = false) String nom,
             @RequestParam(required = false) String email) {
-        return ResponseEntity.ok(conducteurService.search(nom, email));
+        return ResponseEntity.ok(conducteurService.search(nom, email));// 200 OK
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ConducteurResponse> update(@PathVariable Long id, 
             @RequestBody @Valid ConducteurRequest request) {
-        return ResponseEntity.ok(conducteurService.update(id, request));
+        return ResponseEntity.ok(conducteurService.update(id, request));// 200 OK
     }
 
 
 
 @GetMapping("/{id}/trajets")
 public ResponseEntity<List<TrajetResponse>> getTrajets(@PathVariable Long id) {
-    return ResponseEntity.ok(trajetService.findByConducteurId(id));
+    return ResponseEntity.ok(trajetService.findByConducteurId(id));// 200 OK
 }
 }
