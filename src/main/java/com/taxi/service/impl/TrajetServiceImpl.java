@@ -20,6 +20,7 @@ import com.taxi.entity.Trajet;
 import com.taxi.entity.Vehicule;
 import com.taxi.enums.StatutTrajet;
 import com.taxi.exception.BadRequestException;
+import com.taxi.exception.BusinessRuleException;
 import com.taxi.exception.ForbiddenActionException;
 import com.taxi.exception.ResourceNotFoundException;
 import com.taxi.mapper.TrajetMapper;
@@ -208,5 +209,38 @@ public class TrajetServiceImpl implements TrajetService {
                 calculerPlacesRestantes(trajet),
                 base.statut(),
                 pointsOrdonnes);
+    }
+
+    @Override
+    @Transactional
+    public void terminerTrajet(Long id, Long conducteurId) {
+        Trajet trajet = trajetRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Trajet introuvable lors de la tentative de clôture id={}", id);
+                    return new ResourceNotFoundException("Trajet non trouvé avec l'id: " + id);
+                });
+
+        if (!trajet.getConducteur().getId().equals(conducteurId)) {
+            log.warn(
+                    "Règle refusée (403) : le conducteur id={} tente de terminer le trajet id={} appartenant au conducteur id={}",
+                    conducteurId, id, trajet.getConducteur().getId());
+            throw new ForbiddenActionException("Seul le conducteur propriétaire peut terminer ce trajet.");
+        }
+
+        if (trajet.getStatut() == StatutTrajet.TERMINE || trajet.getStatut() == StatutTrajet.ANNULE) {
+            log.warn("Règle refusée (409) : impossible de terminer le trajet id={} avec le statut {}",
+                    id, trajet.getStatut());
+            throw new BusinessRuleException("Impossible de terminer un trajet déjà terminé ou annulé.");
+        }
+
+        if (!LocalDateTime.now().isAfter(trajet.getDateDepart())) {
+            log.warn("Règle refusée (409) : impossible de terminer le trajet id={} avant l'heure de départ ({})",
+                    id, trajet.getDateDepart());
+            throw new BusinessRuleException("Impossible de terminer le trajet avant l'heure de départ.");
+        }
+
+        trajet.setStatut(StatutTrajet.TERMINE);
+        trajetRepository.save(trajet);
+        log.info("Trajet terminé id={}", id);
     }
 }
