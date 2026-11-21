@@ -10,4 +10,6 @@ public interface TrajetService {
 
     TrajetResponse findById(Long id);
     List<TrajetResponse> findByConducteurId(Long conducteurId);
+
+    void terminerTrajet(Long id, Long conducteurId);
 }

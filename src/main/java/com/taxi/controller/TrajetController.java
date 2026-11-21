@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.taxi.dto.TrajetRequest;
@@ -36,8 +38,9 @@ public class TrajetController {
         return ResponseEntity.ok(trajetService.findById(id));
     }
 
-    // @GetMapping("conducteurs/{id}/trajets")
-    // public ResponseEntity<List<TrajetResponse>> getTrajetsByConducteur(@PathVariable Long id) {
-    //     return ResponseEntity.ok(trajetService.findByConducteurId(id));
-    // }
+    @PatchMapping("/{id}/terminer")
+    public ResponseEntity<Void> terminerTrajet( @PathVariable Long id, @RequestParam Long conducteurId) {
+        trajetService.terminerTrajet(id, conducteurId);
+        return ResponseEntity.noContent().build();
+    }
 }
