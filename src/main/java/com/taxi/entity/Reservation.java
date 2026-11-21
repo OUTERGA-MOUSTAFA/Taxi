@@ -49,7 +49,7 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private StatutReservation statut = StatutReservation.EN_ATTENTE;
+    private StatutReservation statut = StatutReservation.CONFIRMEE;
 
     @PrePersist
     protected void onCreate() {
@@ -57,7 +57,7 @@ public class Reservation {
             this.dateReservation = LocalDateTime.now();
         }
         if (this.statut == null) {
-            this.statut = StatutReservation.EN_ATTENTE;
+            this.statut = StatutReservation.CONFIRMEE;
         }
     }
 }

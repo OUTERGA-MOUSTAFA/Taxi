@@ -1,8 +1,6 @@
 package com.taxi.enums;
 
 public enum StatutReservation {
-    EN_ATTENTE,
-    CONFIRMEE,
-    ANNULEE,
-    REFUSEE
+    CONFIRMEE, //réservation validée, places occupées.
+    ANNULEE // annulée par le passager ou avec le trajet.
 }
