@@ -35,18 +35,18 @@ public class TrajetController {
     @PostMapping
     public ResponseEntity<TrajetResponse> publierTrajet(@RequestBody @Valid TrajetRequest request) {
         TrajetResponse response = trajetService.publierTrajet(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);// 201 Created
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TrajetResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(trajetService.findById(id));
+        return ResponseEntity.ok(trajetService.findById(id));// 200 OK
     }
 
     @PatchMapping("/{id}/terminer")
     public ResponseEntity<Void> terminerTrajet(@PathVariable Long id, @RequestParam Long conducteurId) {
         trajetService.terminerTrajet(id, conducteurId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();// 204 No Content
     }
 
     @GetMapping("/recherche")
@@ -58,7 +58,7 @@ public class TrajetController {
             @RequestParam(required = false) BigDecimal prixMax,
             @PageableDefault (size = 10) Pageable pageable) {
 
-        return ResponseEntity.ok(
+        return ResponseEntity.ok(//200 OK
                 trajetService.rechercherTrajets(villeDepart, villeArrivee, date, places, prixMax, pageable));
     }
 }

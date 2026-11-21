@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
     }
 
     // 404 : ressource introuvable
-    @ExceptionHandler(ResourceNotFoundException.class)
+    @ExceptionHandler(ResourceNotFoundException.class)// 404 Not Found
     public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException ex) {
         return probleme(HttpStatus.NOT_FOUND, "Ressource non trouvée", "not-found", ex.getMessage());
     }
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ProblemDetail handleBadRequest(BadRequestException ex) {
+    public ProblemDetail handleBadRequest(BadRequestException ex) {//400 Bad Request
         return probleme(HttpStatus.BAD_REQUEST, "Requête invalide", "requete-invalide", ex.getMessage());
     }
 
