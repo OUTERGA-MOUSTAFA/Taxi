@@ -85,7 +85,7 @@ public class ReservationServiceImpl implements ReservationService {
         verifierDoublonReservation(passager.getId(), trajet.getId());
         verifierPlacesDisponibles(trajet, request.nombrePlaces());
 
-        BigDecimal montantTotal = calculerMontant(pointMontee, pointDescente, request.nombrePlaces());
+        BigDecimal montantTotal = calculerMontant(pointMontee, pointDescente, request.nombrePlaces());// Calcul du montant pointMontee, pointDescente, places
 
         Reservation reservation = reservationMapper.toEntity(request);
         reservation.setPassager(passager);
