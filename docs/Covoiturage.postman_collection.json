@@ -1,0 +1,618 @@
+{
+  "info": {
+    "_postman_id": "b94106b2-0482-462d-9fb3-55c2b1d9d834",
+    "name": "Covoiturage",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53288852",
+    "_collection_link": "https://go.postman.co/collection/53288852-b94106b2-0482-462d-9fb3-55c2b1d9d834?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "vehicules",
+      "item": [
+        {
+          "name": "crée vehicules",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"marque\": \"Dacia\",\r\n  \"modele\": \"Logan\",\r\n  \"immatriculation\": \"1234-A-6\",\r\n  \"couleur\": \"Blanc\",\r\n  \"capacite\": 4,\r\n  \"conducteurId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "modifier vehicules",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"marque\": \"Dacia\",\r\n  \"modele\": \"Logan\",\r\n  \"immatriculation\": \"1234-A-6\",\r\n  \"couleur\": \"Gris\",\r\n  \"capacite\": 4,\r\n  \"conducteurId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "list vehicules dyale conducteur x",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules/conducteur/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules",
+                "conducteur",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "jib vehicule X",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules/2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete vehicule x",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "conducteurs",
+      "item": [
+        {
+          "name": "create conducteur",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nom\": \"outerga\",\r\n  \"prenom\": \"yassin\",\r\n  \"email\": \"yassin@taxi.ma\",\r\n  \"telephone\": \"0612345612\",\r\n  \"numeroPermis\": \"PH123451\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conducteurs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conducteurs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update conducteurs",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nom\": \"Alaoui\",\r\n  \"prenom\": \"Hamid\",\r\n  \"email\": \"hamid@taxi.ma\",\r\n  \"telephone\": \"0612345678\",\r\n  \"numeroPermis\": \"PH123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conducteurs/recherche?nom=alaoui@email.com",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conducteurs",
+                "recherche"
+              ],
+              "query": [
+                {
+                  "key": "nom",
+                  "value": "alaoui@email.com"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "jib conducteur x",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "jib conducteurs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conducteurs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conducteurs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "cherche conducteur",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conducteurs/recherche?email=youssef",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "conducteurs",
+                "recherche"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "youssef"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "passagers",
+      "item": [
+        {
+          "name": "create passagers",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nom\": \"Alaoui\",\r\n  \"prenom\": \"Hamid\",\r\n  \"email\": \"hamid@taxi.ma\",\r\n  \"telephone\": \"0612345678\",\r\n  \"numeroPermis\": \"PH123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update passagers",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "jib passager x",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "jib passagers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "cherche passagers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consulter reservation x",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers/1/reservations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers",
+                "1",
+                "reservations"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "trajets",
+      "item": [
+        {
+          "name": "crée le trajet",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"conducteurId\": 1,\r\n  \"vehiculeId\": 1,\r\n  \"placesProposees\": 3,\r\n  \"pointsArret\": [\r\n    {\r\n      \"ville\": \"Rabat\",\r\n      \"heurePassage\": \"2026-12-10T08:00:00\",\r\n      \"prixDepuisDepart\": 0.00\r\n    },\r\n    {\r\n      \"ville\": \"Casablanca\",\r\n      \"heurePassage\": \"2026-12-10T09:30:00\",\r\n      \"prixDepuisDepart\": 40.00\r\n    },\r\n    {\r\n      \"ville\": \"Settat\",\r\n      \"heurePassage\": \"2026-12-10T10:45:00\",\r\n      \"prixDepuisDepart\": 70.00\r\n    },\r\n    {\r\n      \"ville\": \"Marrakech\",\r\n      \"heurePassage\": \"2026-12-10T13:00:00\",\r\n      \"prixDepuisDepart\": 120.00\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/trajets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trajets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "terminer Trajet",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trajets/1/terminer?conducteurId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trajets",
+                "1",
+                "terminer"
+              ],
+              "query": [
+                {
+                  "key": "conducteurId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "jib trajet x",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trajets/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trajets",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "jib trajets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trajets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trajets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "cherch trajet",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trajets/recherche?villeDepart=Rabat&villeArrivee=Marrakech&date=2026-12-10&places=1&page=0&size=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trajets",
+                "recherche"
+              ],
+              "query": [
+                {
+                  "key": "villeDepart",
+                  "value": "Rabat"
+                },
+                {
+                  "key": "villeArrivee",
+                  "value": "Marrakech"
+                },
+                {
+                  "key": "date",
+                  "value": "2026-12-10"
+                },
+                {
+                  "key": "places",
+                  "value": "1"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "annuler trajets x",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trajets/1/annuler?conducteurId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trajets",
+                "1",
+                "annuler"
+              ],
+              "query": [
+                {
+                  "key": "conducteurId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "consulté reservations dyale taxi x",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trajets/1/reservations?conducteurId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trajets",
+                "1",
+                "reservations"
+              ],
+              "query": [
+                {
+                  "key": "conducteurId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "reservations",
+      "item": [
+        {
+          "name": "crée reservations",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"passagerId\": 1,\r\n  \"trajetId\": 1,\r\n  \"pointMonteeId\": 3,\r\n  \"pointDescenteId\": 4,\r\n  \"nombrePlaces\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "annuler reservations",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/2/annuler?passagerId=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations",
+                "2",
+                "annuler"
+              ],
+              "query": [
+                {
+                  "key": "passagerId",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
