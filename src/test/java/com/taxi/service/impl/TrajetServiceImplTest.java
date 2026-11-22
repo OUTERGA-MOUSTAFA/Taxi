@@ -146,7 +146,7 @@ class TrajetServiceImplTest {
         });
     }
 
-    // --- S7.1.2 : Cas nominal ---
+    // : Cas nominal: publierTrajet Creer Trajet En Statut Publie
 
     @Test
     void publierTrajet_nominal_doitCreerTrajetEnStatutPublie() {
@@ -162,6 +162,27 @@ class TrajetServiceImplTest {
         assertThat(response.villeArrivee()).isEqualTo("Marrakech");
         assertThat(response.pointsArret()).hasSize(4);
         verify(trajetRepository).save(any(Trajet.class));
+    }
+
+    // cas nominal: dyale terminerTrajet statut = TERMINE 
+    @Test
+    void terminerTrajet_apresHeureDepart_doitPasserEnStatutTermine() {
+        Conducteur hamid = conducteurHamid();
+        Vehicule vehicule = vehiculeCapacite4(hamid);
+        Trajet trajetPasse = Trajet.builder()
+                .id(60L)
+                .conducteur(hamid)
+                .vehicule(vehicule)
+                .dateDepart(LocalDateTime.now().minusHours(2))
+                .statut(StatutTrajet.PUBLIE)
+                .build();
+
+        when(trajetRepository.findById(60L)).thenReturn(Optional.of(trajetPasse));
+
+        trajetService.terminerTrajet(60L, 1L);
+
+        assertThat(trajetPasse.getStatut()).isEqualTo(StatutTrajet.TERMINE);
+        verify(trajetRepository).save(trajetPasse);
     }
 
     // --- S7.1.3 : Règles refusées ---
