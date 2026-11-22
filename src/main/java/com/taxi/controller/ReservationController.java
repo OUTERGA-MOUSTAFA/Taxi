@@ -32,7 +32,7 @@ public class ReservationController {
     // annuler reservations dyalek
     @PatchMapping("/{id}/annuler")
     public ResponseEntity<Void> annuler(@PathVariable Long id, @RequestParam Long passagerId) {
-        reservationService.annuler(id, passagerId);
+        reservationService.annulerReservation(id, passagerId);
         return ResponseEntity.noContent().build();
     }
 }

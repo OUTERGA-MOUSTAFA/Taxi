@@ -185,7 +185,7 @@ public class ReservationServiceImpl implements ReservationService {
         return Math.max(0, trajet.getPlacesProposees() - totalConfirmees);
     }
 
-    // han Consulter {id}/reservation o annuler {id}/reservation 
+    // han Consulter {id}/reservation o annuler {id}/reservation
     @Override
     @Transactional(readOnly = true)
     public List<ReservationResponse> findByPassagerId(Long passagerId) {
@@ -194,28 +194,29 @@ public class ReservationServiceImpl implements ReservationService {
             throw new ResourceNotFoundException("Passager non trouvé avec l'id: " + passagerId);
         }
 
-        return reservationRepository.findByPassagerId(passagerId).stream()
+        return reservationRepository.findDetailByPassagerId(passagerId).stream()
                 .map(reservationMapper::toResponse)
                 .toList();
     }
 
     @Override
     @Transactional
-    public void annuler(Long reservationId, Long passagerId) {
+    public void annulerReservation(Long reservationId, Long passagerId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> {
                     log.warn("Annulation refusée (404) : réservation introuvable id={}", reservationId);
                     return new ResourceNotFoundException("Réservation non trouvée avec l'id: " + reservationId);
                 });
 
-        if (!reservation.getPassager().getId().equals(passagerId)) {
+        if (!reservation.getPassager().getId().equals(passagerId)) {// seul le passager de la réservation peut l'annuler
+                                                                    // donc 403
             log.warn(
                     "Règle refusée (403) : passager id={} tente d'annuler la réservation id={} appartenant au passager id={}",
                     passagerId, reservationId, reservation.getPassager().getId());
             throw new ForbiddenActionException("Vous ne pouvez annuler que vos propres réservations.");
         }
 
-        if (reservation.getStatut() == StatutReservation.ANNULEE) {
+        if (reservation.getStatut() == StatutReservation.ANNULEE) {// réservation déjà annulée donc 409
             log.warn("Règle refusée (409) : réservation id={} est déjà annulée", reservationId);
             throw new BusinessRuleException("Cette réservation est déjà annulée.");
         }
@@ -224,7 +225,8 @@ public class ReservationServiceImpl implements ReservationService {
         LocalDateTime dateDepart = reservation.getTrajet().getDateDepart();
         long heuresAvantDepart = Duration.between(maintenant, dateDepart).toHours();
 
-        if (heuresAvantDepart < 24) { // vérifier propriétaire, statut, `Duration.between(now, dateDepart).toHours() >= 24`
+        if (heuresAvantDepart < 24) { // vérifier propriétaire, statut, `Duration.between(now, dateDepart).toHours()
+                                      // >= 24`
             log.warn(
                     "Règle refusée (409) : annulation impossible pour réservation id={} à moins de 24h du départ (heures restantes={})",
                     reservationId, heuresAvantDepart);
@@ -236,7 +238,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         Trajet trajet = reservation.getTrajet();// jib had trajet
         mettreAJourStatut(trajet);// `mettreAJourStatut(trajet)`
-        trajetRepository.save(trajet);
+        trajetRepository.save(trajet);// @Transactional : si une exception survient, l'annulation de la réservation et
+                                      // le changement de statut du trajet sont annulés ensemble.
 
         log.info("Réservation annulée id={} par passager id={} ; statut trajet id={} -> {}",
                 reservationId, passagerId, trajet.getId(), trajet.getStatut());

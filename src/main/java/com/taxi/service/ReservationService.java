@@ -12,5 +12,5 @@ public interface ReservationService {
     // Consulter {id}/reservations
     List<ReservationResponse> findByPassagerId(Long passagerId);
     // annuler {id}/reservations b patch
-    void annuler(Long reservationId, Long passagerId);
+    void annulerReservation(Long reservationId, Long passagerId);
 }
