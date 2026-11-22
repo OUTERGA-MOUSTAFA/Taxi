@@ -2,6 +2,7 @@ package com.taxi.controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.taxi.dto.ReservationResponse;
 import com.taxi.dto.TrajetRechercheResponse;
 import com.taxi.dto.TrajetRequest;
 import com.taxi.dto.TrajetResponse;
@@ -70,5 +72,12 @@ public class TrajetController {
             @RequestParam Long conducteurId) {
         trajetService.annulerTrajet(id, conducteurId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/reservations")
+    public ResponseEntity<List<ReservationResponse>> getReservationsByTrajet(
+            @PathVariable Long id,
+            @RequestParam Long conducteurId) {
+        return ResponseEntity.ok(trajetService.findReservationsByTrajetId(id, conducteurId));
     }
 }
