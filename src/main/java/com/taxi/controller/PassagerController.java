@@ -15,19 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taxi.dto.PassagerRequest;
 import com.taxi.dto.PassagerResponse;
+import com.taxi.dto.ReservationResponse;
 import com.taxi.service.PassagerService;
+import com.taxi.service.ReservationService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@RestController 
-@RequestMapping ("/api/passagers")
+@RestController
+@RequestMapping("/api/passagers")
 @RequiredArgsConstructor
 public class PassagerController {
     private final PassagerService passagerService;
-
+    private final ReservationService reservationService;
     // public PassagerController(PassagerService passagerService){
-    //     this.passagerService = passagerService;
+    // this.passagerService = passagerService;
     // }
 
     @PostMapping
@@ -53,5 +55,11 @@ public class PassagerController {
     @GetMapping("/recherche")
     public ResponseEntity<List<PassagerResponse>> search(@RequestParam(required = false) String email) {
         return ResponseEntity.ok(passagerService.searchByEmail(email));
+    }
+
+    // jib les reservations dyali
+    @GetMapping("/{id}/reservations")
+    public ResponseEntity<List<ReservationResponse>> getReservationsByPassager(@PathVariable Long id) {
+        return ResponseEntity.ok(reservationService.findByPassagerId(id));
     }
 }
