@@ -62,4 +62,12 @@ public class TrajetController {
                 villeDepart, villeArrivee, date, places, prixMax, pageable);
         return ResponseEntity.ok(page);// 200 ok
     }
+
+    @PatchMapping("/{id}/annuler")
+    public ResponseEntity<Void> annulerTrajet(
+            @PathVariable Long id,
+            @RequestParam Long conducteurId) {
+        trajetService.annulerTrajet(id, conducteurId);
+        return ResponseEntity.noContent().build();
+    }
 }
