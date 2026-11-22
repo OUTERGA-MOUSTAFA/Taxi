@@ -79,6 +79,7 @@ public class ReservationServiceImpl implements ReservationService {
                             "Point de descente non trouvé avec l'id: " + request.pointDescenteId());
                 });
 
+                // kela wehda 3endha warn dyalha, 9a3ida 1 l kela méthode
         verifierAppartenancePoints(trajet, pointMontee, pointDescente);
         verifierOrdrePoints(pointMontee, pointDescente);
         verifierStatutTrajet(trajet);
@@ -92,7 +93,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setTrajet(trajet);
         reservation.setPointMontee(pointMontee);
         reservation.setPointDescente(pointDescente);
-        reservation.setNombrePlaces(request.nombrePlaces());
+        // reservation.setNombrePlaces(request.nombrePlaces()); hadi blash mapper kaytkelef
         reservation.setMontantTotal(montantTotal);
         reservation.setStatut(StatutReservation.CONFIRMEE);
 
