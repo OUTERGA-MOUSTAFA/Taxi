@@ -29,6 +29,7 @@ import com.taxi.exception.ForbiddenActionException;
 import com.taxi.exception.ResourceNotFoundException;
 import com.taxi.mapper.TrajetMapper;
 import com.taxi.repository.ConducteurRepository;
+import com.taxi.repository.ReservationRepository;
 import com.taxi.repository.TrajetRepository;
 import com.taxi.repository.VehiculeRepository;
 import com.taxi.service.TrajetService;
@@ -44,6 +45,7 @@ public class TrajetServiceImpl implements TrajetService {
     private final ConducteurRepository conducteurRepository;
     private final VehiculeRepository vehiculeRepository;
     private final TrajetMapper trajetMapper;
+    private final ReservationRepository reservationRepository;
 
     @Override
     @Transactional
@@ -185,12 +187,9 @@ public class TrajetServiceImpl implements TrajetService {
     }
 
     private int calculerPlacesRestantes(Trajet trajet) {
-        // E6: remplacer par :
-        // int placesReservees =
-        // reservationRepository.sumPlacesByTrajetIdAndStatut(trajet.getId(),
-        // StatutReservation.CONFIRMEE);
-        // return Math.max(0, trajet.getPlacesProposees() - placesReservees);
-        return trajet.getPlacesProposees();
+        Long confirmees = reservationRepository.sumPlacesConfirmees(trajet.getId());
+        int totalConfirmees = confirmees != null ? confirmees.intValue() : 0;
+        return Math.max(0, trajet.getPlacesProposees() - totalConfirmees);
     }
 
     private TrajetResponse buildTrajetResponse(Trajet trajet) {
