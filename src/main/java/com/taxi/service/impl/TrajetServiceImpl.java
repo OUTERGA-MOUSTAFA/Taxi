@@ -67,7 +67,7 @@ public class TrajetServiceImpl implements TrajetService {
         verifierHeures(points);
         verifierPrix(points);
         verifierPlaces(request.placesProposees(), vehicule);
- 
+
         Trajet trajet = trajetMapper.toEntity(request);
         trajet.setConducteur(conducteur);
         trajet.setVehicule(vehicule);
@@ -316,7 +316,6 @@ public class TrajetServiceImpl implements TrajetService {
             throw new ForbiddenActionException("Seul le conducteur propriétaire peut annuler ce trajet.");
         }
 
-
         // check wash TERMINE pas Anuler ila kant businessRulleException
         if (trajet.getStatut() == StatutTrajet.TERMINE || trajet.getStatut() == StatutTrajet.ANNULE) {
             log.warn("Règle refusée (409) : impossible d'annuler le trajet id={} avec le statut {}",
@@ -327,17 +326,17 @@ public class TrajetServiceImpl implements TrajetService {
         trajet.setStatut(StatutTrajet.ANNULE);// hna trajet kanbdleh l annuler
         trajetRepository.save(trajet);
 
-        List<Reservation> reservations = reservationRepository.findByTrajetId(id);
-        long nbAnnulees = reservations.stream() // reservation kandeze 3lihem b stream bash nred kel CONFIRMEE ->> ANNULEE
-                .filter(r -> r.getStatut() == StatutReservation.CONFIRMEE)
-                .peek(r -> r.setStatut(StatutReservation.ANNULEE))// kanbdel status dyale reservation l Annulee
-                .count();
+        List<Reservation> confirmees = reservationRepository.findByTrajetId(id).stream()
+                .filter(r -> r.getStatut() == StatutReservation.CONFIRMEE)// kanjib le reservations li statut dyalhem Confirmee
+                .toList();
 
-        if (!reservations.isEmpty()) {
-            reservationRepository.saveAll(reservations);
+        confirmees.forEach(r -> r.setStatut(StatutReservation.ANNULEE)); // kanbdel status dyale reservation l Annulee
+
+        if (!confirmees.isEmpty()) {
+            reservationRepository.saveAll(confirmees); // trajet o reservations managed f @Transactional hibernet kaydir UPDATE
         }
 
         log.info("Trajet annulé id={} par conducteur id={} ; {} réservation(s) passée(s) à ANNULEE",
-                id, conducteurId, nbAnnulees);
+                id, conducteurId, confirmees.size());
     }
 }
