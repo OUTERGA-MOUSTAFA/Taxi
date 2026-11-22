@@ -74,6 +74,7 @@ public class TrajetController {
         return ResponseEntity.noContent().build();
     }
 
+    // consulé les reservations dyale trajet x
     @GetMapping("/{id}/reservations")
     public ResponseEntity<List<ReservationResponse>> getReservationsByTrajet(
             @PathVariable Long id,

@@ -363,8 +363,8 @@ public class TrajetServiceImpl implements TrajetService {
                     "Seul le conducteur propriétaire peut consulter les réservations de ce trajet.");
         }
 
-        List<ReservationResponse> resultats = reservationRepository.findByTrajetId(trajetId).stream()
-                .map(ReservationMapper::toResponse)
+        List<ReservationResponse> resultats = reservationRepository.findDetailByTrajetId(trajetId).stream()
+                .map(reservationMapper::toResponse)
                 .toList();
 
         log.info("Consultation réservations trajet id={} par conducteur id={} : {} réservation(s)",

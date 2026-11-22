@@ -23,7 +23,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByTrajetId(Long trajetId);
 
-    // List<Reservation> findByPassagerId(Long passagerId);//=> hadi katjib trajet 3ad tmshi tjib pointDescente apre tmshi tjib pointMontee
+    // List<Reservation> findByPassagerId(Long passagerId);//=> hadi katjib trajet
+    // 3ad tmshi tjib pointDescente apre tmshi tjib pointMontee
     // كيوليو 2 طلبات بلاصت 7
     @Query("select r from Reservation r " +
             "join fetch r.passager " +
@@ -33,4 +34,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "where r.passager.id = :passagerId " +
             "order by r.dateReservation desc")
     List<Reservation> findDetailByPassagerId(@Param("passagerId") Long passagerId);
+
+    @Query("select r from Reservation r " +
+            "join fetch r.passager " +
+            "join fetch r.pointMontee " +
+            "join fetch r.pointDescente " +
+            "where r.trajet.id = :trajetId " +
+            "order by r.dateReservation")
+    List<Reservation> findDetailByTrajetId(@Param("trajetId") Long trajetId);// dert hadi hit ghadir liya findByTrajetId(khlitha l annulerTrajet)
+                                                                             // ila khdemt biha f method
+                                                                             // findReservationsByTrajetId N + 1: kela reservation jib passager jib demande les pointArret
 }
