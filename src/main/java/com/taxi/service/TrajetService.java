@@ -28,4 +28,7 @@ public interface TrajetService {
             int places,
             BigDecimal prixMax,
             Pageable pageable);
+
+    // hada condusteur li kaydire
+    void annulerTrajet(Long id, Long conducteurId);
 }
