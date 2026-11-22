@@ -63,6 +63,7 @@ public class TrajetController {
         return ResponseEntity.ok(page);// 200 ok
     }
 
+    // conducteur kay annulee trajet dyale
     @PatchMapping("/{id}/annuler")
     public ResponseEntity<Void> annulerTrajet(
             @PathVariable Long id,
