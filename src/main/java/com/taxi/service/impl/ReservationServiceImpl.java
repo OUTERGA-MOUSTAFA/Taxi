@@ -2,6 +2,9 @@ package com.taxi.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +21,7 @@ import com.taxi.enums.StatutReservation;
 import com.taxi.enums.StatutTrajet;
 import com.taxi.exception.BadRequestException;
 import com.taxi.exception.BusinessRuleException;
+import com.taxi.exception.ForbiddenActionException;
 import com.taxi.exception.ResourceNotFoundException;
 import com.taxi.mapper.ReservationMapper;
 import com.taxi.repository.PassagerRepository;
@@ -79,21 +83,26 @@ public class ReservationServiceImpl implements ReservationService {
                             "Point de descente non trouvé avec l'id: " + request.pointDescenteId());
                 });
 
-                // kela wehda 3endha warn dyalha, 9a3ida 1 l kela méthode
+        // kela wehda 3endha warn dyalha, 9a3ida 1 l kela méthode
         verifierAppartenancePoints(trajet, pointMontee, pointDescente);
         verifierOrdrePoints(pointMontee, pointDescente);
         verifierStatutTrajet(trajet);
         verifierDoublonReservation(passager.getId(), trajet.getId());
         verifierPlacesDisponibles(trajet, request.nombrePlaces());
 
-        BigDecimal montantTotal = calculerMontant(pointMontee, pointDescente, request.nombrePlaces());// Calcul du montant pointMontee, pointDescente, places
+        BigDecimal montantTotal = calculerMontant(pointMontee, pointDescente, request.nombrePlaces());// Calcul du
+                                                                                                      // montant
+                                                                                                      // pointMontee,
+                                                                                                      // pointDescente,
+                                                                                                      // places
 
         Reservation reservation = reservationMapper.toEntity(request);
         reservation.setPassager(passager);
         reservation.setTrajet(trajet);
         reservation.setPointMontee(pointMontee);
         reservation.setPointDescente(pointDescente);
-        // reservation.setNombrePlaces(request.nombrePlaces()); hadi blash mapper kaytkelef
+        // reservation.setNombrePlaces(request.nombrePlaces()); hadi blash mapper
+        // kaytkelef
         reservation.setMontantTotal(montantTotal);
         reservation.setStatut(StatutReservation.CONFIRMEE);
 
@@ -174,5 +183,65 @@ public class ReservationServiceImpl implements ReservationService {
         Long confirmees = reservationRepository.sumPlacesConfirmees(trajet.getId());
         int totalConfirmees = confirmees != null ? confirmees.intValue() : 0;
         return Math.max(0, trajet.getPlacesProposees() - totalConfirmees);
+    }
+
+    // han Consulter {id}/reservation o annuler {id}/reservation
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> findByPassagerId(Long passagerId) {
+        if (!passagerRepository.existsById(passagerId)) {
+            log.warn("Consultation historique refusée (404) : passager introuvable id={}", passagerId);
+            throw new ResourceNotFoundException("Passager non trouvé avec l'id: " + passagerId);
+        }
+
+        return reservationRepository.findDetailByPassagerId(passagerId).stream()
+                .map(reservationMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void annulerReservation(Long reservationId, Long passagerId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> {
+                    log.warn("Annulation refusée (404) : réservation introuvable id={}", reservationId);
+                    return new ResourceNotFoundException("Réservation non trouvée avec l'id: " + reservationId);
+                });
+
+        if (!reservation.getPassager().getId().equals(passagerId)) {// seul le passager de la réservation peut l'annuler
+                                                                    // donc 403
+            log.warn(
+                    "Règle refusée (403) : passager id={} tente d'annuler la réservation id={} appartenant au passager id={}",
+                    passagerId, reservationId, reservation.getPassager().getId());
+            throw new ForbiddenActionException("Vous ne pouvez annuler que vos propres réservations.");
+        }
+
+        if (reservation.getStatut() == StatutReservation.ANNULEE) {// réservation déjà annulée donc 409
+            log.warn("Règle refusée (409) : réservation id={} est déjà annulée", reservationId);
+            throw new BusinessRuleException("Cette réservation est déjà annulée.");
+        }
+
+        LocalDateTime maintenant = LocalDateTime.now();
+        LocalDateTime dateDepart = reservation.getTrajet().getDateDepart();
+        long heuresAvantDepart = Duration.between(maintenant, dateDepart).toHours();
+
+        if (heuresAvantDepart < 24) { // vérifier propriétaire, statut, `Duration.between(now, dateDepart).toHours()
+                                      // >= 24`
+            log.warn(
+                    "Règle refusée (409) : annulation impossible pour réservation id={} à moins de 24h du départ (heures restantes={})",
+                    reservationId, heuresAvantDepart);
+            throw new BusinessRuleException("L'annulation n'est autorisée que jusqu'à 24 heures avant le départ.");
+        }
+
+        reservation.setStatut(StatutReservation.ANNULEE);
+        reservationRepository.save(reservation);
+
+        Trajet trajet = reservation.getTrajet();// jib had trajet
+        mettreAJourStatut(trajet);// `mettreAJourStatut(trajet)`
+        trajetRepository.save(trajet);// @Transactional : si une exception survient, l'annulation de la réservation et
+                                      // le changement de statut du trajet sont annulés ensemble.
+
+        log.info("Réservation annulée id={} par passager id={} ; statut trajet id={} -> {}",
+                reservationId, passagerId, trajet.getId(), trajet.getStatut());
     }
 }
