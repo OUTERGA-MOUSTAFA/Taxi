@@ -71,7 +71,7 @@ class TrajetServiceImplTest {
     private Conducteur autreConducteur() {
         return Conducteur.builder()
                 .id(2L)
-                .nom("Youssef")
+                .nom("karim")
                 .build();
     }
 
@@ -107,7 +107,7 @@ class TrajetServiceImplTest {
 
         when(conducteurRepository.findById(conducteur.getId())).thenReturn(Optional.of(conducteur));
         when(vehiculeRepository.findById(vehicule.getId())).thenReturn(Optional.of(vehicule));
-        when(trajetMapper.toEntity(request)).thenReturn(mappedTrajet);// tayakhd les valeurs normal donc manhtashj mock
+        when(trajetMapper.toEntity(request)).thenReturn(mappedTrajet);// ttrajetMapper mock → khasna when(...) sinon kayrje3 null
 
         when(trajetMapper.toPointEntity(any(PointArretRequest.class))).thenAnswer(inv -> {
             PointArretRequest p = inv.getArgument(0);
@@ -202,7 +202,8 @@ class TrajetServiceImplTest {
         when(vehiculeRepository.findById(10L)).thenReturn(Optional.of(vehicule));
 
         assertThatThrownBy(() -> trajetService.publierTrajet(request))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("capacité du véhicule");
 
         verify(trajetRepository, never()).save(any());
     }
@@ -239,7 +240,8 @@ class TrajetServiceImplTest {
         when(vehiculeRepository.findById(10L)).thenReturn(Optional.of(vehicule));
 
         assertThatThrownBy(() -> trajetService.publierTrajet(request))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Les heures de passage");
 
         verify(trajetRepository, never()).save(any());
     }
@@ -260,7 +262,8 @@ class TrajetServiceImplTest {
         when(vehiculeRepository.findById(10L)).thenReturn(Optional.of(vehicule));
 
         assertThatThrownBy(() -> trajetService.publierTrajet(request))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Les prix depuis le départ");
 
         verify(trajetRepository, never()).save(any());
     }
