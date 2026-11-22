@@ -224,7 +224,7 @@ public class ReservationServiceImpl implements ReservationService {
         LocalDateTime dateDepart = reservation.getTrajet().getDateDepart();
         long heuresAvantDepart = Duration.between(maintenant, dateDepart).toHours();
 
-        if (heuresAvantDepart < 24) {
+        if (heuresAvantDepart < 24) { // vérifier propriétaire, statut, `Duration.between(now, dateDepart).toHours() >= 24`
             log.warn(
                     "Règle refusée (409) : annulation impossible pour réservation id={} à moins de 24h du départ (heures restantes={})",
                     reservationId, heuresAvantDepart);
@@ -234,8 +234,8 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatut(StatutReservation.ANNULEE);
         reservationRepository.save(reservation);
 
-        Trajet trajet = reservation.getTrajet();
-        mettreAJourStatut(trajet);
+        Trajet trajet = reservation.getTrajet();// jib had trajet
+        mettreAJourStatut(trajet);// `mettreAJourStatut(trajet)`
         trajetRepository.save(trajet);
 
         log.info("Réservation annulée id={} par passager id={} ; statut trajet id={} -> {}",
