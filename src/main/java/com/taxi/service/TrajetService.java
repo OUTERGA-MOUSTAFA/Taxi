@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.taxi.dto.ReservationResponse;
 import com.taxi.dto.TrajetRechercheResponse;
 import com.taxi.dto.TrajetRequest;
 import com.taxi.dto.TrajetResponse;
@@ -28,4 +29,9 @@ public interface TrajetService {
             int places,
             BigDecimal prixMax,
             Pageable pageable);
+
+    // hada condusteur li kaydire
+    void annulerTrajet(Long id, Long conducteurId);
+
+    List<ReservationResponse> findReservationsByTrajetId(Long trajetId, Long conducteurId);
 }

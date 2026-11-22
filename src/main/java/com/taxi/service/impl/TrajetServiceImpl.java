@@ -15,18 +15,22 @@ import org.springframework.stereotype.Service;
 
 import com.taxi.dto.PointArretRequest;
 import com.taxi.dto.PointArretResponse;
+import com.taxi.dto.ReservationResponse;
 import com.taxi.dto.TrajetRechercheResponse;
 import com.taxi.dto.TrajetRequest;
 import com.taxi.dto.TrajetResponse;
 import com.taxi.entity.Conducteur;
 import com.taxi.entity.PointArret;
+import com.taxi.entity.Reservation;
 import com.taxi.entity.Trajet;
 import com.taxi.entity.Vehicule;
+import com.taxi.enums.StatutReservation;
 import com.taxi.enums.StatutTrajet;
 import com.taxi.exception.BadRequestException;
 import com.taxi.exception.BusinessRuleException;
 import com.taxi.exception.ForbiddenActionException;
 import com.taxi.exception.ResourceNotFoundException;
+import com.taxi.mapper.ReservationMapper;
 import com.taxi.mapper.TrajetMapper;
 import com.taxi.repository.ConducteurRepository;
 import com.taxi.repository.ReservationRepository;
@@ -45,6 +49,7 @@ public class TrajetServiceImpl implements TrajetService {
     private final ConducteurRepository conducteurRepository;
     private final VehiculeRepository vehiculeRepository;
     private final TrajetMapper trajetMapper;
+    private final ReservationMapper reservationMapper;
     private final ReservationRepository reservationRepository;
 
     @Override
@@ -77,7 +82,7 @@ public class TrajetServiceImpl implements TrajetService {
             trajet.addPointArret(point);
         }
 
-        PointArretRequest premierPoint = points.get(0);// firt point d'arret
+        PointArretRequest premierPoint = points.get(0);// first point d'arret
         PointArretRequest dernierPoint = points.get(points.size() - 1);
 
         trajet.setVilleDepart(premierPoint.ville().trim()); // villeDepart
@@ -293,6 +298,77 @@ public class TrajetServiceImpl implements TrajetService {
 
         log.info("Recherche trajets {} -> {} le {} (places={}) : {} résultat(s)",
                 villeDepart.trim(), villeArrivee.trim(), date, places, resultats.getTotalElements());
+
+        return resultats;
+    }
+
+    // conducteur Anuller trajet donc khas idar rollback l reservations
+    @Override
+    @Transactional
+    public void annulerTrajet(Long id, Long conducteurId) {
+        Trajet trajet = trajetRepository.findById(id)// 9eleb 3la Trajet
+                .orElseThrow(() -> {
+                    log.warn("Annulation trajet refusée (404) : trajet introuvable id={}", id);
+                    return new ResourceNotFoundException("Trajet non trouvé avec l'id: " + id);
+                });
+
+        if (!trajet.getConducteur().getId().equals(conducteurId)) {// check wash trajet dyal had conducteur id
+            log.warn(
+                    "Règle refusée (403) : conducteur id={} tente d'annuler le trajet id={} appartenant au conducteur id={}",
+                    conducteurId, id, trajet.getConducteur().getId());
+            throw new ForbiddenActionException("Seul le conducteur propriétaire peut annuler ce trajet.");
+        }
+
+        // check wash TERMINE pas Anuler ila kant businessRulleException
+        if (trajet.getStatut() == StatutTrajet.TERMINE || trajet.getStatut() == StatutTrajet.ANNULE) {
+            log.warn("Règle refusée (409) : impossible d'annuler le trajet id={} avec le statut {}",
+                    id, trajet.getStatut());
+            throw new BusinessRuleException("Impossible d'annuler un trajet déjà terminé ou annulé.");
+        }
+
+        trajet.setStatut(StatutTrajet.ANNULE);// hna trajet kanbdleh l annuler
+        trajetRepository.save(trajet);
+
+        List<Reservation> confirmees = reservationRepository.findByTrajetId(id).stream()
+                .filter(r -> r.getStatut() == StatutReservation.CONFIRMEE)// kanjib le reservations li statut dyalhem
+                                                                          // Confirmee
+                .toList();
+
+        confirmees.forEach(r -> r.setStatut(StatutReservation.ANNULEE)); // kanbdel status dyale reservation l Annulee
+
+        if (!confirmees.isEmpty()) {
+            reservationRepository.saveAll(confirmees); // trajet o reservations managed f @Transactional hibernet kaydir
+                                                       // UPDATE
+        }
+
+        log.info("Trajet annulé id={} par conducteur id={} ; {} réservation(s) passée(s) à ANNULEE",
+                id, conducteurId, confirmees.size());
+    }
+
+    // consulté les reservations dyale trajet x
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> findReservationsByTrajetId(Long trajetId, Long conducteurId) {
+        Trajet trajet = trajetRepository.findById(trajetId)
+                .orElseThrow(() -> {
+                    log.warn("Consultation réservations refusée (404) : trajet introuvable id={}", trajetId);
+                    return new ResourceNotFoundException("Trajet non trouvé avec l'id: " + trajetId);
+                });
+
+        if (!trajet.getConducteur().getId().equals(conducteurId)) {
+            log.warn(
+                    "Règle refusée (403) : conducteur id={} tente de consulter les réservations du trajet id={} appartenant au conducteur id={}",
+                    conducteurId, trajetId, trajet.getConducteur().getId());
+            throw new ForbiddenActionException(
+                    "Seul le conducteur propriétaire peut consulter les réservations de ce trajet.");
+        }
+
+        List<ReservationResponse> resultats = reservationRepository.findDetailByTrajetId(trajetId).stream()
+                .map(reservationMapper::toResponse)
+                .toList();
+
+        log.info("Consultation réservations trajet id={} par conducteur id={} : {} réservation(s)",
+                trajetId, conducteurId, resultats.size());
 
         return resultats;
     }
