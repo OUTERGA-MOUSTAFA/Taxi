@@ -79,25 +79,26 @@ public class ReservationServiceImpl implements ReservationService {
                             "Point de descente non trouvé avec l'id: " + request.pointDescenteId());
                 });
 
+                // kela wehda 3endha warn dyalha, 9a3ida 1 l kela méthode
         verifierAppartenancePoints(trajet, pointMontee, pointDescente);
         verifierOrdrePoints(pointMontee, pointDescente);
         verifierStatutTrajet(trajet);
         verifierDoublonReservation(passager.getId(), trajet.getId());
         verifierPlacesDisponibles(trajet, request.nombrePlaces());
 
-        BigDecimal montantTotal = calculerMontant(pointMontee, pointDescente, request.nombrePlaces());
+        BigDecimal montantTotal = calculerMontant(pointMontee, pointDescente, request.nombrePlaces());// Calcul du montant pointMontee, pointDescente, places
 
         Reservation reservation = reservationMapper.toEntity(request);
         reservation.setPassager(passager);
         reservation.setTrajet(trajet);
         reservation.setPointMontee(pointMontee);
         reservation.setPointDescente(pointDescente);
-        reservation.setNombrePlaces(request.nombrePlaces());
+        // reservation.setNombrePlaces(request.nombrePlaces()); hadi blash mapper kaytkelef
         reservation.setMontantTotal(montantTotal);
         reservation.setStatut(StatutReservation.CONFIRMEE);
 
         Reservation saved = reservationRepository.save(reservation);
-        mettreAJourStatut(trajet);
+        mettreAJourStatut(trajet);// COMPLET si 0 place, PUBLIE sinon (réutilisée à l'annulation).
         trajetRepository.save(trajet);
 
         log.info("Réservation créée id={} pour passager id={} sur trajet id={} (montant={} DH)",
@@ -156,6 +157,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .setScale(2, RoundingMode.HALF_UP);
     }
 
+    // COMPLET si 0 place, PUBLIE sinon (réutilisée à l'annulation).
     public void mettreAJourStatut(Trajet trajet) {
         if (trajet.getStatut() == StatutTrajet.TERMINE || trajet.getStatut() == StatutTrajet.ANNULE) {
             return;

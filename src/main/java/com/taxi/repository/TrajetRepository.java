@@ -64,8 +64,9 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
             "  and lower(pd.ville) = lower(:villeArrivee) " +
             "  and t.statut = :statut " +
             "  and pm.heurePassage >= :debutJour and pm.heurePassage < :finJour " + // date du départ b seway3 o nhar
-            // "  and cast(t.placesProposees as Long) >= :places " +
-            " and (t.placesProposees - coalesce((select sum(r.nombrePlaces) from Reservation r where r.trajet = t and r.statut = com.taxi.enums.StatutReservation.CONFIRMEE), 0)) >= :places " +
+            // " and cast(t.placesProposees as Long) >= :places " +
+            " and (t.placesProposees - coalesce((select sum(r.nombrePlaces) from Reservation r where r.trajet = t and r.statut = com.taxi.enums.StatutReservation.CONFIRMEE), 0)) >= :places "
+            +
             "  and (:prixMax is null or (pd.prixDepuisDepart - pm.prixDepuisDepart) <= :prixMax) " +
             "order by t.dateDepart asc", countQuery = "select count(t) " +
                     "from Trajet t " +
@@ -88,4 +89,10 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
             @Param("prixMax") BigDecimal prixMax,
             @Param("statut") StatutTrajet statut,
             Pageable pageable);
+
+    // hadi ndirha bash tban l 1 user ila bezaf men 1 user dare deux passagers
+    // réservent la dernière place en même temps
+    // @Lock(LockModeType.PESSIMISTIC_WRITE)
+    // @Query("select t from Trajet t where t.id = :id")
+    // Optional<Trajet> findByIdForUpdate(@Param("id") Long id);
 }
