@@ -164,7 +164,7 @@ class TrajetServiceImplTest {
         verify(trajetRepository).save(any(Trajet.class));
     }
 
-    // cas nominal: dyale terminerTrajet statut = TERMINE 
+    // cas nominal: dyale terminerTrajet statut = TERMINE
     @Test
     void terminerTrajet_apresHeureDepart_doitPasserEnStatutTermine() {
         Conducteur hamid = conducteurHamid();
@@ -185,8 +185,13 @@ class TrajetServiceImplTest {
         verify(trajetRepository).save(trajetPasse);
     }
 
-    // --- S7.1.3 : Règles refusées ---
-
+    // Règles refusées: 5 Places Pour Capacite 4 + vehicule Autre Conducteur
+    // + heures Non Croissantes + prix Non Croissant + avant Heure Depart
+    /*
+     * le pricipe n3iyet 3la trajetService o nkherbe9 logic dyale data ola rulle
+     * bash ndir test 3la Exception li ghadi itele3 liya et la database makayt
+     * save fiha walo: verify(trajetRepository, never()).save(any());
+     */
     @Test
     void publierTrajet_5PlacesPourCapacite4_doitLeverExceptionSansSauvegarder() {
         Conducteur hamid = conducteurHamid();
