@@ -97,7 +97,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatut(StatutReservation.CONFIRMEE);
 
         Reservation saved = reservationRepository.save(reservation);
-        mettreAJourStatut(trajet);
+        mettreAJourStatut(trajet);// COMPLET si 0 place, PUBLIE sinon (réutilisée à l'annulation).
         trajetRepository.save(trajet);
 
         log.info("Réservation créée id={} pour passager id={} sur trajet id={} (montant={} DH)",
@@ -156,6 +156,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .setScale(2, RoundingMode.HALF_UP);
     }
 
+    // COMPLET si 0 place, PUBLIE sinon (réutilisée à l'annulation).
     public void mettreAJourStatut(Trajet trajet) {
         if (trajet.getStatut() == StatutTrajet.TERMINE || trajet.getStatut() == StatutTrajet.ANNULE) {
             return;
