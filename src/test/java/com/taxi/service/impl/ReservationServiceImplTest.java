@@ -1,4 +1,32 @@
 package com.taxi.service.impl;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.taxi.dto.ReservationRequest;
+import com.taxi.dto.ReservationResponse;
+import com.taxi.entity.Passager;
+import com.taxi.entity.PointArret;
+import com.taxi.entity.Reservation;
+import com.taxi.entity.Trajet;
+import com.taxi.enums.StatutReservation;
+import com.taxi.enums.StatutTrajet;
+import com.taxi.mapper.ReservationMapper;
+import com.taxi.repository.PassagerRepository;
+import com.taxi.repository.PointArretRepository;
+import com.taxi.repository.ReservationRepository;
+import com.taxi.repository.TrajetRepository;
+
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceImplTest {
 
@@ -70,4 +98,60 @@ class ReservationServiceImplTest {
             );
         });
     }
+
+    @Test
+    void reserver_settatVersMarrakech1Place_doitCalculer50DH() {
+        LocalDateTime depart = LocalDateTime.now().plusDays(3);
+        Passager salma = passager(1L, "Salma");
+        Trajet trajet = trajetPublie(10L, 3, depart);
+        PointArret settat = point(22L, trajet, "Settat", 2, depart.plusHours(2), "70.00");
+        PointArret marrakech = point(23L, trajet, "Marrakech", 3, depart.plusHours(4), "120.00");
+
+        ReservationRequest request = new ReservationRequest(1L, 10L, 22L, 23L, 1);
+
+        when(passagerRepository.findById(1L)).thenReturn(Optional.of(salma));
+        when(trajetRepository.findById(10L)).thenReturn(Optional.of(trajet));
+        when(pointArretRepository.findById(22L)).thenReturn(Optional.of(settat));
+        when(pointArretRepository.findById(23L)).thenReturn(Optional.of(marrakech));
+        when(reservationRepository.existsByPassagerIdAndTrajetIdAndStatut(1L, 10L, StatutReservation.CONFIRMEE))
+                .thenReturn(false);
+        // Avant sauvegarde : 0 place confirmée ; après sauvegarde (mockée via sumPlacesConfirmees = 1L) : 2 places restantes
+        when(reservationRepository.sumPlacesConfirmees(10L)).thenReturn(0L, 1L);
+        stubMapperBasique(request, salma, trajet, settat, marrakech);
+
+        ReservationResponse response = reservationService.reserver(request);
+
+        assertThat(response.montantTotal()).isEqualByComparingTo("50.00");
+        assertThat(trajet.getStatut()).isEqualTo(StatutTrajet.PUBLIE);
+        verify(reservationRepository).save(any(Reservation.class));
+    }
+
+    @Test
+    void reserver_casablancaVersMarrakech2Places_doitCalculer160DHetPasserTrajetEnComplet() {
+        LocalDateTime depart = LocalDateTime.now().plusDays(3);
+        Passager karim = passager(2L, "Karim");
+        Trajet trajet = trajetPublie(10L, 2, depart);
+        PointArret casa = point(21L, trajet, "Casablanca", 1, depart.plusHours(1), "40.00");
+        PointArret marrakech = point(23L, trajet, "Marrakech", 3, depart.plusHours(4), "120.00");
+
+        ReservationRequest request = new ReservationRequest(2L, 10L, 21L, 23L, 2);
+
+        when(passagerRepository.findById(2L)).thenReturn(Optional.of(karim));
+        when(trajetRepository.findById(10L)).thenReturn(Optional.of(trajet));
+        when(pointArretRepository.findById(21L)).thenReturn(Optional.of(casa));
+        when(pointArretRepository.findById(23L)).thenReturn(Optional.of(marrakech));
+        when(reservationRepository.existsByPassagerIdAndTrajetIdAndStatut(2L, 10L, StatutReservation.CONFIRMEE))
+                .thenReturn(false);
+        // Avant sauvegarde : 0 place ; après sauvegarde : 2 places confirmées sur 2 => 0 restante => COMPLET
+        when(reservationRepository.sumPlacesConfirmees(10L)).thenReturn(0L, 2L);
+        stubMapperBasique(request, karim, trajet, casa, marrakech);
+
+        ReservationResponse response = reservationService.reserver(request);
+
+        assertThat(response.montantTotal()).isEqualByComparingTo("160.00");
+        assertThat(trajet.getStatut()).isEqualTo(StatutTrajet.COMPLET);
+        verify(trajetRepository).save(trajet);
+    }
+
+    
 }
