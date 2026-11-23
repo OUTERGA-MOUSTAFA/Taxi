@@ -417,15 +417,3 @@
 
 **Sous-tâches :**
 - **S8.4.1 — Dépendance springdoc + configuration** — bean `OpenAPI` avec titre « API Covoiturage » et version.
-
-## Planning proposé (4 jours)
-
-| Jour | Epics | Objectif de fin de journée |
-|---|---|---|
-| Lun 16/11 | E1, E2 | L'application démarre, CRUD conducteur et passager, erreurs en ProblemDetail |
-| Mar 17/11 | E3, E4 | Véhicules, publication et consultation d'un trajet, terminer un trajet |
-| Mer 18/11 | E5, E6 (T6.1 et T6.2) | Recherche JPQL paginée, réservation avec montant et statut COMPLET |
-| Jeu 19/11 | E6 (T6.3 à T6.5), E7 | Annulations, tests unitaires verts |
-| Ven 20/11 | E8 | Postman, seed, README, Swagger, slides, JIRA à jour, rendu |
-
-**Sprint 1** = E1 à E4 (lundi et mardi). **Sprint 2** = E5 à E8 (mercredi à vendredi).
