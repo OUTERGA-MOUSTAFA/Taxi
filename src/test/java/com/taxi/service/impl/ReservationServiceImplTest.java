@@ -232,4 +232,7 @@ class ReservationServiceImplTest {
         assertThat(trajet.getStatut()).isEqualTo(StatutTrajet.PUBLIE);
         verify(reservationRepository, never()).save(any());
     }
+
+
+    
 }
