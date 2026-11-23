@@ -24,7 +24,7 @@ import com.taxi.service.VehiculeService;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // sawb constructure automatique dyale les field li final o @NotNull
 public class VehiculeServiceImpl implements VehiculeService {
 
     private static final Logger log = LoggerFactory.getLogger(VehiculeServiceImpl.class);

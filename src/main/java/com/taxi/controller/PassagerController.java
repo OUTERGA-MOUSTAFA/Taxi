@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/passagers")
-@RequiredArgsConstructor
+@RequiredArgsConstructor // sawb constructure automatique dyale les field li final o @NotNull
 public class PassagerController {
     private final PassagerService passagerService;
     private final ReservationService reservationService;
