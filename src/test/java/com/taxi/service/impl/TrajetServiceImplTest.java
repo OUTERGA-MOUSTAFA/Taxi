@@ -106,7 +106,7 @@ class TrajetServiceImplTest {
                 .build();
 
         when(conducteurRepository.findById(conducteur.getId())).thenReturn(Optional.of(conducteur));
-        when(vehiculeRepository.findById(vehicule.getId())).thenReturn(Optional.of(vehicule));
+        when(vehiculeRepository.findById(vehicule.getId())).thenReturn(Optional.of(vehicule)); 
         when(trajetMapper.toEntity(request)).thenReturn(mappedTrajet);// ttrajetMapper mock → khasna when(...) sinon kayrje3 null
 
         when(trajetMapper.toPointEntity(any(PointArretRequest.class))).thenAnswer(inv -> {
