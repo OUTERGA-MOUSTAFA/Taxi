@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/trajets")
-@RequiredArgsConstructor
+@RequiredArgsConstructor// sawb constructure automatique dyale les field li final o @NotNull
 public class TrajetController {
 
     private final TrajetService trajetService;

@@ -16,7 +16,7 @@ import com.taxi.service.ConducteurService;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // sawb constructure automatique dyale les field li final o @NotNull
 public class ConducteurServiceImpl implements ConducteurService {
     private final ConducteurRepository conducteurRepository;
     private final ConducteurMapper conducteurMapper;

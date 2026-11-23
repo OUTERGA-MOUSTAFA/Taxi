@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/vehicules")
-@RequiredArgsConstructor
+@RequiredArgsConstructor// sawb constructure automatique dyale les field li final o @NotNull
 public class VehiculeController {
 
     private final VehiculeService vehiculeService;

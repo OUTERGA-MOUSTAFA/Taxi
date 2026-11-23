@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // sawb constructure automatique dyale les field li final o @NotNull
 public class TrajetServiceImpl implements TrajetService {
     private static final Logger log = LoggerFactory.getLogger(TrajetServiceImpl.class);
 
