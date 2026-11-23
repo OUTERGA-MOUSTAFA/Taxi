@@ -1,11 +1,15 @@
 package com.taxi.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +25,8 @@ import com.taxi.entity.Reservation;
 import com.taxi.entity.Trajet;
 import com.taxi.enums.StatutReservation;
 import com.taxi.enums.StatutTrajet;
+import com.taxi.exception.BadRequestException;
+import com.taxi.exception.BusinessRuleException;
 import com.taxi.mapper.ReservationMapper;
 import com.taxi.repository.PassagerRepository;
 import com.taxi.repository.PointArretRepository;
@@ -73,7 +79,7 @@ class ReservationServiceImplTest {
     }
 
     private void stubMapperBasique(ReservationRequest request, Passager passager, Trajet trajet,
-                                   PointArret montee, PointArret descente) {
+            PointArret montee, PointArret descente) {
         when(reservationMapper.toEntity(request)).thenAnswer(inv -> Reservation.builder().build());
         when(reservationRepository.save(any(Reservation.class))).thenAnswer(inv -> {
             Reservation r = inv.getArgument(0);
@@ -94,8 +100,7 @@ class ReservationServiceImplTest {
                     r.getNombrePlaces(),
                     r.getMontantTotal(),
                     LocalDateTime.now(),
-                    r.getStatut()
-            );
+                    r.getStatut());
         });
     }
 
@@ -115,7 +120,8 @@ class ReservationServiceImplTest {
         when(pointArretRepository.findById(23L)).thenReturn(Optional.of(marrakech));
         when(reservationRepository.existsByPassagerIdAndTrajetIdAndStatut(1L, 10L, StatutReservation.CONFIRMEE))
                 .thenReturn(false);
-        // Avant sauvegarde : 0 place confirmée ; après sauvegarde (mockée via sumPlacesConfirmees = 1L) : 2 places restantes
+        // Avant sauvegarde : 0 place confirmée ; après sauvegarde (mockée via
+        // sumPlacesConfirmees = 1L) : 2 places restantes
         when(reservationRepository.sumPlacesConfirmees(10L)).thenReturn(0L, 1L);
         stubMapperBasique(request, salma, trajet, settat, marrakech);
 
@@ -142,7 +148,8 @@ class ReservationServiceImplTest {
         when(pointArretRepository.findById(23L)).thenReturn(Optional.of(marrakech));
         when(reservationRepository.existsByPassagerIdAndTrajetIdAndStatut(2L, 10L, StatutReservation.CONFIRMEE))
                 .thenReturn(false);
-        // Avant sauvegarde : 0 place ; après sauvegarde : 2 places confirmées sur 2 => 0 restante => COMPLET
+        // Avant sauvegarde : 0 place ; après sauvegarde : 2 places confirmées sur 2 =>
+        // 0 restante => COMPLET
         when(reservationRepository.sumPlacesConfirmees(10L)).thenReturn(0L, 2L);
         stubMapperBasique(request, karim, trajet, casa, marrakech);
 
@@ -153,5 +160,76 @@ class ReservationServiceImplTest {
         verify(trajetRepository).save(trajet);
     }
 
-    
+    @Test
+    void reserver_surTrajetComplet_doitLeverBusinessRuleException409() {
+        LocalDateTime depart = LocalDateTime.now().plusDays(2);
+        Passager salma = passager(1L, "Salma");
+        Trajet trajet = Trajet.builder()
+                .id(10L)
+                .placesProposees(3)
+                .dateDepart(depart)
+                .statut(StatutTrajet.COMPLET)
+                .build();
+        PointArret settat = point(22L, trajet, "Settat", 2, depart.plusHours(2), "70.00");
+        PointArret marrakech = point(23L, trajet, "Marrakech", 3, depart.plusHours(4), "120.00");
+
+        ReservationRequest request = new ReservationRequest(1L, 10L, 22L, 23L, 1);
+
+        when(passagerRepository.findById(1L)).thenReturn(Optional.of(salma));
+        when(trajetRepository.findById(10L)).thenReturn(Optional.of(trajet));
+        when(pointArretRepository.findById(22L)).thenReturn(Optional.of(settat));
+        when(pointArretRepository.findById(23L)).thenReturn(Optional.of(marrakech));
+
+        assertThatThrownBy(() -> reservationService.reserver(request))
+                .isInstanceOf(BusinessRuleException.class);
+
+        assertThat(trajet.getStatut()).isEqualTo(StatutTrajet.COMPLET);
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void reserver_monteeApresDescente_doitLeverBadRequestException400() {
+        LocalDateTime depart = LocalDateTime.now().plusDays(2);
+        Passager salma = passager(1L, "Salma");
+        Trajet trajet = trajetPublie(10L, 3, depart);
+        PointArret marrakech = point(23L, trajet, "Marrakech", 3, depart.plusHours(4), "120.00");
+        PointArret settat = point(22L, trajet, "Settat", 2, depart.plusHours(2), "70.00");
+
+        ReservationRequest request = new ReservationRequest(1L, 10L, 23L, 22L, 1);
+
+        when(passagerRepository.findById(1L)).thenReturn(Optional.of(salma));
+        when(trajetRepository.findById(10L)).thenReturn(Optional.of(trajet));
+        when(pointArretRepository.findById(23L)).thenReturn(Optional.of(marrakech));
+        when(pointArretRepository.findById(22L)).thenReturn(Optional.of(settat));
+
+        assertThatThrownBy(() -> reservationService.reserver(request))
+                .isInstanceOf(BadRequestException.class);
+
+        assertThat(trajet.getStatut()).isEqualTo(StatutTrajet.PUBLIE);
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void annuler_aMoinsDe24Heures_doitLeverBusinessRuleException409() {
+        LocalDateTime departDans2Heures = LocalDateTime.now().plusHours(2);
+        Passager salma = passager(1L, "Salma");
+        Trajet trajet = trajetPublie(10L, 3, departDans2Heures);
+        Reservation reservation = Reservation.builder()
+                .id(50L)
+                .passager(salma)
+                .trajet(trajet)
+                .nombrePlaces(1)
+                .montantTotal(new BigDecimal("50.00"))
+                .statut(StatutReservation.CONFIRMEE)
+                .build();
+
+        when(reservationRepository.findById(50L)).thenReturn(Optional.of(reservation));
+
+        assertThatThrownBy(() -> reservationService.annulerReservation(50L, 1L))
+                .isInstanceOf(BusinessRuleException.class);
+
+        assertThat(reservation.getStatut()).isEqualTo(StatutReservation.CONFIRMEE);
+        assertThat(trajet.getStatut()).isEqualTo(StatutTrajet.PUBLIE);
+        verify(reservationRepository, never()).save(any());
+    }
 }
